@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include <ctre/Phoenix.h>
+#include <ctre/phoenix/sensors/CANCoder.h>
+#include <ctre/phoenix/motorcontrol/can/TalonFX.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -35,10 +36,13 @@ class SwerveModule {
 
   // frc::PWMSparkMax m_driveMotor;
   // frc::PWMSparkMax m_turningMotor;
-
-  // frc::Encoder m_driveEncoder;
-  // frc::Encoder m_turningEncoder;
+  ctre::phoenix::motorcontrol::can::TalonFX _canDriveMotor {0};
+  ctre::phoenix::motorcontrol::can::TalonFX _canTurnDrive {0};
   
+
+  ctre::phoenix::sensors::CANCoder _canDriveEncoder {0};
+  ctre::phoenix::sensors::CANCoder _canTurnEncoder {1};
+
 
   frc2::PIDController m_drivePIDController{1.0, 0, 0};
   frc::ProfiledPIDController<units::radians> m_turningPIDController{
