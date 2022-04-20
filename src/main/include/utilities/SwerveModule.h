@@ -19,8 +19,7 @@
 
 class SwerveModule {
  public:
-  SwerveModule(int canDriveMotor, int canTurnMotor,
-               int canDriveEncoder, int canTurnEncoder);
+  SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnEncoderID);
 
   frc::SwerveModuleState GetState() const;
   void SetDesiredState(const frc::SwerveModuleState& state);
@@ -28,7 +27,7 @@ class SwerveModule {
  private:
   static constexpr double kWheelRadius = 0.0508;
   static constexpr int kEncoderResolution = 4096;
-
+  static constexpr double kRotationConversion = 10/2048/6.71;
   static constexpr auto kModuleMaxAngularVelocity =
       wpi::numbers::pi * 1_rad_per_s;  // radians per second
   static constexpr auto kModuleMaxAngularAcceleration =
@@ -36,12 +35,11 @@ class SwerveModule {
 
   // frc::PWMSparkMax m_driveMotor;
   // frc::PWMSparkMax m_turningMotor;
-  ctre::phoenix::motorcontrol::can::TalonFX _canDriveMotor {0};
-  ctre::phoenix::motorcontrol::can::TalonFX _canTurnDrive {0};
+  ctre::phoenix::motorcontrol::can::TalonFX _canDriveMotor;
+  ctre::phoenix::motorcontrol::can::TalonFX _canTurnMotor;
   
 
-  ctre::phoenix::sensors::CANCoder _canDriveEncoder {0};
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder {1};
+  ctre::phoenix::sensors::CANCoder _canTurnEncoder;
 
 
   frc2::PIDController m_drivePIDController{1.0, 0, 0};
