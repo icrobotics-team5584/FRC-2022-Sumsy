@@ -21,13 +21,13 @@ class SwerveModule {
  public:
   SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnEncoderID);
 
-  frc::SwerveModuleState GetState() const;
+  frc::SwerveModuleState GetState();
   void SetDesiredState(const frc::SwerveModuleState& state);
 
  private:
   static constexpr double kWheelRadius = 0.0508;
   static constexpr int kEncoderResolution = 4096;
-  static constexpr double kRotationConversion = 10/2048/6.71;
+  static constexpr double kRotationConversion = 10/2048/6.71*wpi::numbers::pi*0.1016;
   static constexpr auto kModuleMaxAngularVelocity =
       wpi::numbers::pi * 1_rad_per_s;  // radians per second
   static constexpr auto kModuleMaxAngularAcceleration =
