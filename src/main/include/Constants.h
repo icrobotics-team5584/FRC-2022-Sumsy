@@ -13,3 +13,19 @@
  * command-specific namespaces within this header, which can then be used where
  * they are needed.
  */
+
+namespace can {
+  constexpr int tfxDriveBaseFrontRight = 1; //check what prefix it should have with liam
+  constexpr int tfxDriveBaseBackRight = 2;
+  constexpr int tfxDriveBaseFrontLeft = 3;
+  constexpr int tfxDriveBaseBackLeft = 4;
+  constexpr int spmStorage = 99;
+  constexpr int spmIntake = 99;
+  constexpr int spmShooter1 = 99;
+  constexpr int spmShooter2 = 99;
+  
+}
+
+namespace pcm {
+}
+
