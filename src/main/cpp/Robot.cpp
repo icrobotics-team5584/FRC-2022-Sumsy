@@ -6,8 +6,33 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
+#include <ctre/phoenix/sensors/CANCoder.h>
 
-void Robot::RobotInit() {}
+void Robot::DriveWithJoystick(bool fieldRelative) {
+  // Get the x speed. We are inverting this because Xbox controllers return
+  // negative values when we push forward.
+  const auto xSpeed = -m_xspeedLimiter.Calculate(
+                          frc::ApplyDeadband(m_controller.GetLeftY(), 0.02)) *
+                      SubDriveBase::kMaxSpeed;
+  // Get the y speed or sideways/strafe speed. We are inverting this because
+  // we want a positive value when we pull to the left. Xbox controllers
+  // return positive values when you pull to the right by default.
+  const auto ySpeed = -m_yspeedLimiter.Calculate(
+                          frc::ApplyDeadband(m_controller.GetLeftX(), 0.02)) *
+                      SubDriveBase::kMaxSpeed;
+  // Get the rate of angular rotation. We are inverting this because we want a
+  // positive value when we pull to the left (remember, CCW is positive in
+  // mathematics). Xbox controllers return positive values when you pull to
+  // the right by default.
+  const auto rot = -m_rotLimiter.Calculate(
+                       frc::ApplyDeadband(m_controller.GetRightX(), 0.02)) *
+                   SubDriveBase::kMaxAngularSpeed;
+  m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative);
+}
+
+void Robot::RobotInit() {
+
+}
 
 /**
  * This function is called every robot packet, no matter the mode. Use
@@ -53,6 +78,17 @@ void Robot::TeleopInit() {
     m_autonomousCommand->Cancel();
     m_autonomousCommand = nullptr;
   }
+
+  ctre::phoenix::sensors::CANCoder en1(0);
+  ctre::phoenix::sensors::CANCoder en2(4);
+  ctre::phoenix::sensors::CANCoder en3(8);
+  ctre::phoenix::sensors::CANCoder en4(12);
+
+  en1.SetPosition(0);
+  en2.SetPosition(0);
+  en3.SetPosition(0);
+  en4.SetPosition(0);
+
 }
 
 /**
