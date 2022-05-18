@@ -31,16 +31,11 @@ void Robot::DriveWithJoystick(bool fieldRelative) {
 }
 
 void Robot::RobotInit() {
-  ctre::phoenix::sensors::CANCoder en1(0);
-  ctre::phoenix::sensors::CANCoder en2(4);
-  ctre::phoenix::sensors::CANCoder en3(8);
-  ctre::phoenix::sensors::CANCoder en4(12);
-
-  en1.SetPosition(0);
-  en2.SetPosition(0);
-  en3.SetPosition(0);
-  en4.SetPosition(0);
-
+  
+  _canTurnEncoder1.ConfigMagnetOffset(108.5);
+  _canTurnEncoder2.ConfigMagnetOffset(-136.05);
+  _canTurnEncoder3.ConfigMagnetOffset(-166.9);
+  _canTurnEncoder4.ConfigMagnetOffset(148.7);
 
 }
 
@@ -55,10 +50,6 @@ void Robot::RobotInit() {
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
 
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder1{9};
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder2{10};
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder3{11};
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder4{12};
 
   frc::SmartDashboard::PutNumber("ABS POS Encoder Number 9", _canTurnEncoder1.GetAbsolutePosition());
   frc::SmartDashboard::PutNumber("ABS POS Encoder Number 10", _canTurnEncoder2.GetAbsolutePosition());
@@ -108,7 +99,9 @@ void Robot::TeleopInit() {
 /**
  * This function is called periodically during operator control.
  */
-void Robot::TeleopPeriodic() {}
+void Robot::TeleopPeriodic() {
+  DriveWithJoystick(false);
+}
 
 /**
  * This function is called periodically during test mode.
