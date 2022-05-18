@@ -31,6 +31,16 @@ void Robot::DriveWithJoystick(bool fieldRelative) {
 }
 
 void Robot::RobotInit() {
+  ctre::phoenix::sensors::CANCoder en1(0);
+  ctre::phoenix::sensors::CANCoder en2(4);
+  ctre::phoenix::sensors::CANCoder en3(8);
+  ctre::phoenix::sensors::CANCoder en4(12);
+
+  en1.SetPosition(0);
+  en2.SetPosition(0);
+  en3.SetPosition(0);
+  en4.SetPosition(0);
+
 
 }
 
@@ -44,6 +54,21 @@ void Robot::RobotInit() {
  */
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
+
+  ctre::phoenix::sensors::CANCoder _canTurnEncoder1{9};
+  ctre::phoenix::sensors::CANCoder _canTurnEncoder2{10};
+  ctre::phoenix::sensors::CANCoder _canTurnEncoder3{11};
+  ctre::phoenix::sensors::CANCoder _canTurnEncoder4{12};
+
+  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 9", _canTurnEncoder1.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 10", _canTurnEncoder2.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 11", _canTurnEncoder3.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 12", _canTurnEncoder4.GetAbsolutePosition());
+  
+  frc::SmartDashboard::PutNumber("POS Encoder Number 9", _canTurnEncoder1.GetPosition());
+  frc::SmartDashboard::PutNumber("POS Encoder Number 10", _canTurnEncoder2.GetPosition());
+  frc::SmartDashboard::PutNumber("POS Encoder Number 11", _canTurnEncoder3.GetPosition());
+  frc::SmartDashboard::PutNumber("POS Encoder Number 12", _canTurnEncoder4.GetPosition());
 }
 
 /**
@@ -78,17 +103,6 @@ void Robot::TeleopInit() {
     m_autonomousCommand->Cancel();
     m_autonomousCommand = nullptr;
   }
-
-  ctre::phoenix::sensors::CANCoder en1(0);
-  ctre::phoenix::sensors::CANCoder en2(4);
-  ctre::phoenix::sensors::CANCoder en3(8);
-  ctre::phoenix::sensors::CANCoder en4(12);
-
-  en1.SetPosition(0);
-  en2.SetPosition(0);
-  en3.SetPosition(0);
-  en4.SetPosition(0);
-
 }
 
 /**
