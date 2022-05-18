@@ -41,10 +41,10 @@ class SubDriveBase : public frc2::SubsystemBase {
   frc::Translation2d m_backLeftLocation{-0.281_m, +0.281_m};
   frc::Translation2d m_backRightLocation{-0.281_m, -0.281_m};
 
-  SwerveModule m_frontLeft{1, 2, 0};
-  SwerveModule m_frontRight{3, 4, 4};
-  SwerveModule m_backLeft{5, 6, 8};
-  SwerveModule m_backRight{7, 8, 12};
+  SwerveModule m_frontLeft{1, 2, 11};
+  SwerveModule m_frontRight{3, 4, 9};
+  SwerveModule m_backLeft{5, 6, 12};
+  SwerveModule m_backRight{7, 8, 10};
 
   frc::AnalogGyro m_gyro{0};
 
