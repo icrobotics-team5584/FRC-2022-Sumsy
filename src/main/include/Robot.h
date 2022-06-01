@@ -42,8 +42,4 @@ class Robot : public frc::TimedRobot {
 
   RobotContainer m_container;
 
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder1{9};
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder2{10};
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder3{11};
-  ctre::phoenix::sensors::CANCoder _canTurnEncoder4{12};
 };

@@ -24,6 +24,9 @@ class SwerveModule {
   frc::SwerveModuleState GetState();
   void SetDesiredState(const frc::SwerveModuleState& state);
 
+  void ZeroSensors();
+  void SendSensorsToDash();
+
  private:
   static constexpr double kWheelRadius = 0.0508;
   static constexpr int kEncoderResolution = 4096;
@@ -42,11 +45,11 @@ class SwerveModule {
   ctre::phoenix::sensors::CANCoder _canTurnEncoder;
 
 
-  frc2::PIDController m_drivePIDController{1.0, 0, 0};
-  frc::ProfiledPIDController<units::radians> m_turningPIDController{
-      1.0,
+  frc2::PIDController m_drivePIDController{0.2, 0, 0.1};
+  frc::ProfiledPIDController<units::degrees> m_turningPIDController{
+      0.2,
       0.0,
-      0.0,
+      0.1,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
   frc::SimpleMotorFeedforward<units::meters> m_driveFeedforward{1_V,

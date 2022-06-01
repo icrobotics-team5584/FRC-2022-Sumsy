@@ -31,11 +31,7 @@ void Robot::DriveWithJoystick(bool fieldRelative) {
 }
 
 void Robot::RobotInit() {
-  
-  _canTurnEncoder1.ConfigMagnetOffset(108.5);
-  _canTurnEncoder2.ConfigMagnetOffset(-136.05);
-  _canTurnEncoder3.ConfigMagnetOffset(-166.9);
-  _canTurnEncoder4.ConfigMagnetOffset(148.7);
+  m_swerve.ZeroSensors();
 
 }
 
@@ -49,17 +45,6 @@ void Robot::RobotInit() {
  */
 void Robot::RobotPeriodic() {
   frc2::CommandScheduler::GetInstance().Run();
-
-
-  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 9", _canTurnEncoder1.GetAbsolutePosition());
-  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 10", _canTurnEncoder2.GetAbsolutePosition());
-  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 11", _canTurnEncoder3.GetAbsolutePosition());
-  frc::SmartDashboard::PutNumber("ABS POS Encoder Number 12", _canTurnEncoder4.GetAbsolutePosition());
-  
-  frc::SmartDashboard::PutNumber("POS Encoder Number 9", _canTurnEncoder1.GetPosition());
-  frc::SmartDashboard::PutNumber("POS Encoder Number 10", _canTurnEncoder2.GetPosition());
-  frc::SmartDashboard::PutNumber("POS Encoder Number 11", _canTurnEncoder3.GetPosition());
-  frc::SmartDashboard::PutNumber("POS Encoder Number 12", _canTurnEncoder4.GetPosition());
 }
 
 /**

@@ -9,7 +9,10 @@ SubDriveBase::SubDriveBase() = default;
 
 // This method will be called once per scheduler run
 void SubDriveBase::Periodic() {
-    
+  m_frontLeft.SendSensorsToDash();
+  m_frontRight.SendSensorsToDash();
+  m_backLeft.SendSensorsToDash();
+  m_backRight.SendSensorsToDash();
 }
 
 void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
@@ -25,10 +28,15 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
   auto [fl, fr, bl, br] = states;
 
   m_frontLeft.SetDesiredState(fl);
-  m_frontRight.SetDesiredState(fr);
-  m_backLeft.SetDesiredState(bl);
-  m_backRight.SetDesiredState(br);
+  //m_frontRight.SetDesiredState(fr);
+  //m_backLeft.SetDesiredState(bl);
+  //m_backRight.SetDesiredState(br);
+}
 
 
-  
+void SubDriveBase::ZeroSensors() {
+  m_frontLeft.ZeroSensors();
+  m_frontRight.ZeroSensors();
+  m_backLeft.ZeroSensors();
+  m_backRight.ZeroSensors();
 }
