@@ -11,8 +11,7 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnE
                           _canTurnMotor(canTurnMotorID),
                            _canTurnEncoder(canTurnEncoderID){
 
-  m_turningPIDController.EnableContinuousInput(
-    -units::radian_t(wpi::numbers::pi), units::radian_t(wpi::numbers::pi));
+  m_turningPIDController.EnableContinuousInput(-180, 180);
   _canTurnEncoder.SetPositionToAbsolute();
   _canTurnEncoder.ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
 }
@@ -32,15 +31,15 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   //const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed);
 
   // Calculate the turning motor output from the turning PID controller.
-  const auto turnOutput = m_turningPIDController.Calculate(units::degree_t(_canTurnEncoder.GetAbsolutePosition()), referenceState.angle.Degrees());
+  const auto turnOutput = m_turningPIDController.Calculate(_canTurnEncoder.GetAbsolutePosition(), referenceState.angle.Degrees().value());
   frc::SmartDashboard::PutNumber("turnOutput", turnOutput);
   //const auto turnFeedforward = m_turnFeedforward.Calculate(m_turningPIDController.GetSetpoint().velocity);
-
+  frc::SmartDashboard::PutNumber("target", referenceState.angle.Degrees().value());
   // Set the motor outputs.
   //_canDriveMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (driveOutput + (double) driveFeedforward));
-  //_canTurnMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (turnOutput));
-  _canTurnMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute);
-  _canTurnMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, referenceState.angle.Degrees()*);
+  _canTurnMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (turnOutput));
+  //_canTurnMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute);
+  //_canTurnMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, referenceState.angle.Degrees().value());
 }
 
 void SwerveModule::ZeroSensors() {
