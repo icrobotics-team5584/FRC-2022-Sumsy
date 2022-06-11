@@ -30,9 +30,9 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
   auto [fl, fr, bl, br] = states;
 
   m_frontLeft.SetDesiredState(fl);
-  //m_frontRight.SetDesiredState(fr);
-  //m_backLeft.SetDesiredState(bl);
-  //m_backRight.SetDesiredState(br);
+  m_frontRight.SetDesiredState(fr);
+  m_backLeft.SetDesiredState(bl);
+  m_backRight.SetDesiredState(br);
 }
 
 

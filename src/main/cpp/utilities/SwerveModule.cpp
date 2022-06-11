@@ -20,6 +20,13 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnE
   _canTurnMotor.Config_kP(PID_SLOT_INDEX, TURN_P);
   _canTurnMotor.Config_kI(PID_SLOT_INDEX, TURN_I);
   _canTurnMotor.Config_kD(PID_SLOT_INDEX, TURN_D);
+
+  // Config Driving Motor
+  _canDriveMotor.ConfigFactoryDefault();
+  _canDriveMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
+  _canDriveMotor.Config_kP(PID_SLOT_INDEX, DRIVE_P);
+  _canDriveMotor.Config_kI(PID_SLOT_INDEX, DRIVE_I);
+  _canDriveMotor.Config_kD(PID_SLOT_INDEX, DRIVE_D);
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
@@ -29,15 +36,11 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   // Move target angle so we can cross over the 180 degree line without going the long way round
   frc::Rotation2d difference = targetState.angle - GetAngle();
   difference = frc::InputModulus(difference.Degrees(), -180_deg, 180_deg);
-  auto targetAngle = GetAngle().Degrees() + difference.Degrees();
+  targetState.angle = GetAngle() + difference;
 
-  frc::SmartDashboard::PutNumber("Target after move", targetAngle.value());
-
-  // Calculate the drive output from the drive PID controller.
-  //const auto driveOutput = m_drivePIDController.Calculate(_canDriveMotor.GetSelectedSensorVelocity()*kRotationConversion, state.speed.value());
-  
-  //_canDriveMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (driveOutput + (double) driveFeedforward));
-  SetDesiredAngle(targetAngle);
+  // Drive! These functions do some conversions and send targets to falcons
+  SetDesiredAngle(targetState.angle);
+  SetDesiredVelocity(targetState.speed);
 }
 
 void SwerveModule::SendSensorsToDash() {
@@ -69,6 +72,15 @@ void SwerveModule::SetDesiredAngle(frc::Rotation2d angle) {
   const double targetRotations = targetDegrees / 360.0;
   const int targetTics =  targetRotations * TICS_PER_TURNING_WHEEL_REVOLUTION;
   _canTurnMotor.Set(TalonFXControlMode::Position, targetTics);
+}
+
+void SwerveModule::SetDesiredVelocity(units::meters_per_second_t velocity) {
+  // Must convert from meters per second to encoder tics per 100ms, ouch.
+  const double metersPerMS = velocity.value() / 1000;
+  const double metersPer100MS = metersPerMS * 100;
+  const double revolutionsPer100MS = metersPer100MS / WHEEL_RADIUS.value();
+  const double ticsPer100MS = revolutionsPer100MS * TICS_PER_MOTOR_REVOLUTION;
+  _canDriveMotor.Set(TalonFXControlMode::Velocity, ticsPer100MS);
 }
 
 void SwerveModule::ZeroSensors() {
