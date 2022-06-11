@@ -46,6 +46,7 @@ class SwerveModule {
   const double DRIVE_P = 0.1;
   const double DRIVE_I = 0.0;
   const double DRIVE_D = 0.0;
+  const double DRIVE_F = 0.1;
   const int PID_SLOT_INDEX = 0;
 
   TalonFX _canDriveMotor;

@@ -7,7 +7,7 @@
 
 SubDriveBase::SubDriveBase() {
   frc::SmartDashboard::PutNumber("set desired angle", 0);
-};
+}
 
 // This method will be called once per scheduler run
 void SubDriveBase::Periodic() {

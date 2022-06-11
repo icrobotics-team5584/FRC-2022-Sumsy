@@ -27,6 +27,7 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnE
   _canDriveMotor.Config_kP(PID_SLOT_INDEX, DRIVE_P);
   _canDriveMotor.Config_kI(PID_SLOT_INDEX, DRIVE_I);
   _canDriveMotor.Config_kD(PID_SLOT_INDEX, DRIVE_D);
+  _canDriveMotor.Config_kF(PID_SLOT_INDEX, DRIVE_F);
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
