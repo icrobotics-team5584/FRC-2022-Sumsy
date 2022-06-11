@@ -27,6 +27,7 @@ class SwerveModule {
 
   void SetDesiredState(const frc::SwerveModuleState& state);
   void ZeroSensors();
+  void SyncSensors();
   void SendSensorsToDash();
   void SetDesiredAngle(frc::Rotation2d angle);
   frc::Rotation2d GetAngle();

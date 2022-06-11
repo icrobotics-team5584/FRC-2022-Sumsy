@@ -1,5 +1,6 @@
 #include "utilities/SwerveModule.h"
 #include "frc/smartdashboard/SmartDashboard.h"
+#include <frc/MathUtil.h>
 
 SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnEncoderID) 
                           : _canDriveMotor(canDriveMotorID), 
@@ -23,20 +24,23 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnE
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
   // Optimize the reference state to avoid spinning further than 90 degrees
-  const auto state = frc::SwerveModuleState::Optimize(referenceState, GetAngle());
+  auto targetState = frc::SwerveModuleState::Optimize(referenceState, GetAngle());
+
+  // Move target angle so we can cross over the 180 degree line without going the long way round
+  frc::Rotation2d difference = targetState.angle - GetAngle();
+  difference = frc::InputModulus(difference.Degrees(), -180_deg, 180_deg);
+  auto targetAngle = GetAngle().Degrees() + difference.Degrees();
+
+  frc::SmartDashboard::PutNumber("Target after move", targetAngle.value());
 
   // Calculate the drive output from the drive PID controller.
   //const auto driveOutput = m_drivePIDController.Calculate(_canDriveMotor.GetSelectedSensorVelocity()*kRotationConversion, state.speed.value());
   
   //_canDriveMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (driveOutput + (double) driveFeedforward));
-  // SetDesiredAngle(state.angle);
+  SetDesiredAngle(targetAngle);
 }
 
 void SwerveModule::SendSensorsToDash() {
-  if (_canTurnEncoder.GetPosition() > 180 || _canTurnEncoder.GetPosition() < -180) {
-    _canTurnEncoder.SetPositionToAbsolute();
-  }
-  
   const int driveMotorID =  _canDriveMotor.GetDeviceID();
   const int turnMotorID =  _canTurnMotor.GetDeviceID();
   const int turnEncoderID =  _canTurnEncoder.GetDeviceNumber();
@@ -69,4 +73,14 @@ void SwerveModule::SetDesiredAngle(frc::Rotation2d angle) {
 
 void SwerveModule::ZeroSensors() {
   
+}
+
+void SwerveModule::SyncSensors() {
+  double cancoderDegrees = _canTurnEncoder.GetAbsolutePosition();
+  double cancoderRevolutions = cancoderDegrees/360;
+  int cancoderPosInFalconTics = cancoderRevolutions*TICS_PER_TURNING_WHEEL_REVOLUTION;
+
+  _canTurnMotor
+    .GetSensorCollection()
+    .SetIntegratedSensorPosition(cancoderPosInFalconTics);
 }

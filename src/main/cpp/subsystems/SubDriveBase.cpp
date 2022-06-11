@@ -15,9 +15,6 @@ void SubDriveBase::Periodic() {
   // m_frontRight.SendSensorsToDash();
   // m_backLeft.SendSensorsToDash();
   // m_backRight.SendSensorsToDash();
-
-  frc::Rotation2d desiredAngle = units::degree_t(frc::SmartDashboard::GetNumber("set desired angle", 0));
-  m_frontLeft.SetDesiredAngle(desiredAngle);
 }
 
 void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
@@ -32,7 +29,7 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
 
   auto [fl, fr, bl, br] = states;
 
-  //m_frontLeft.SetDesiredState(fl);
+  m_frontLeft.SetDesiredState(fl);
   //m_frontRight.SetDesiredState(fr);
   //m_backLeft.SetDesiredState(bl);
   //m_backRight.SetDesiredState(br);
@@ -40,8 +37,8 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
 
 
 void SubDriveBase::ZeroSensors() {
-  m_frontLeft.ZeroSensors();
-  m_frontRight.ZeroSensors();
-  m_backLeft.ZeroSensors();
-  m_backRight.ZeroSensors();
+  m_frontLeft.SyncSensors();
+  m_frontRight.SyncSensors();
+  m_backLeft.SyncSensors();
+  m_backRight.SyncSensors();
 }
