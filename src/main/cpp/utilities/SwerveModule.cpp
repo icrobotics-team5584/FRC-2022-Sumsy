@@ -14,8 +14,7 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnE
   // Config Turning Motor
   _canTurnMotor.ConfigFactoryDefault();
   _canTurnMotor.ConfigIntegratedSensorAbsoluteRange(AbsoluteSensorRange::Signed_PlusMinus180);
-  _canTurnMotor.ConfigRemoteFeedbackFilter(_canTurnEncoder, 0);
-  _canTurnMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::RemoteSensor0);
+  _canTurnMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor);
   _canTurnMotor.ConfigFeedbackNotContinuous(true);
   _canTurnMotor.Config_kP(PID_SLOT_INDEX, TURN_P);
   _canTurnMotor.Config_kI(PID_SLOT_INDEX, TURN_I);
@@ -30,7 +29,7 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   //const auto driveOutput = m_drivePIDController.Calculate(_canDriveMotor.GetSelectedSensorVelocity()*kRotationConversion, state.speed.value());
   
   //_canDriveMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (driveOutput + (double) driveFeedforward));
-  //SetDesiredAngle(state.angle);
+  // SetDesiredAngle(state.angle);
 }
 
 void SwerveModule::SendSensorsToDash() {
@@ -63,10 +62,9 @@ frc::Rotation2d SwerveModule::GetAngle() {
 
 void SwerveModule::SetDesiredAngle(frc::Rotation2d angle) {
   const double targetDegrees = angle.Degrees().value();
-  //const double targetRotations = targetDegrees / 360.0;
-  //const int targetTics =  targetRotations * TICS_PER_TURNING_WHEEL_REVOLUTION;
-  
-  _canTurnMotor.Set(TalonFXControlMode::Position, targetDegrees);
+  const double targetRotations = targetDegrees / 360.0;
+  const int targetTics =  targetRotations * TICS_PER_TURNING_WHEEL_REVOLUTION;
+  _canTurnMotor.Set(TalonFXControlMode::Position, targetTics);
 }
 
 void SwerveModule::ZeroSensors() {
