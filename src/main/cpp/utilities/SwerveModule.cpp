@@ -1,56 +1,74 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #include "utilities/SwerveModule.h"
 #include "frc/smartdashboard/SmartDashboard.h"
-#include "ctre/Phoenix.h"
 
 SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnEncoderID) 
                           : _canDriveMotor(canDriveMotorID), 
                           _canTurnMotor(canTurnMotorID),
-                           _canTurnEncoder(canTurnEncoderID){
+                          _canTurnEncoder(canTurnEncoderID){
 
-  m_turningPIDController.EnableContinuousInput(-180, 180);
+  // Config CANCoder
+  _canTurnEncoder.ConfigFactoryDefault();
   _canTurnEncoder.SetPositionToAbsolute();
   _canTurnEncoder.ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
-}
 
-frc::SwerveModuleState SwerveModule::GetState() {
-  return {units::meters_per_second_t{_canDriveMotor.GetSelectedSensorVelocity(0)*kRotationConversion},
-          frc::Rotation2d(units::radian_t(_canTurnEncoder.GetAbsolutePosition()*wpi::numbers::pi/180))};
+  // Config Turning Motor
+  _canTurnMotor.ConfigFactoryDefault();
+  _canTurnMotor.ConfigIntegratedSensorAbsoluteRange(AbsoluteSensorRange::Signed_PlusMinus180);
+  _canTurnMotor.ConfigRemoteFeedbackFilter(_canTurnEncoder, 0);
+  _canTurnMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::RemoteSensor0);
+  _canTurnMotor.ConfigFeedbackNotContinuous(true);
+  _canTurnMotor.Config_kP(PID_SLOT_INDEX, TURN_P);
+  _canTurnMotor.Config_kI(PID_SLOT_INDEX, TURN_I);
+  _canTurnMotor.Config_kD(PID_SLOT_INDEX, TURN_D);
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {
   // Optimize the reference state to avoid spinning further than 90 degrees
-  //const auto state = frc::SwerveModuleState::Optimize(referenceState, units::radian_t(_canTurnEncoder.GetAbsolutePosition()*wpi::numbers::pi/180));
+  const auto state = frc::SwerveModuleState::Optimize(referenceState, GetAngle());
 
   // Calculate the drive output from the drive PID controller.
   //const auto driveOutput = m_drivePIDController.Calculate(_canDriveMotor.GetSelectedSensorVelocity()*kRotationConversion, state.speed.value());
-
-  //const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed);
-
-  // Calculate the turning motor output from the turning PID controller.
-  const auto turnOutput = m_turningPIDController.Calculate(_canTurnEncoder.GetAbsolutePosition(), referenceState.angle.Degrees().value());
-  frc::SmartDashboard::PutNumber("turnOutput", turnOutput);
-  //const auto turnFeedforward = m_turnFeedforward.Calculate(m_turningPIDController.GetSetpoint().velocity);
-  frc::SmartDashboard::PutNumber("target", referenceState.angle.Degrees().value());
-  // Set the motor outputs.
+  
   //_canDriveMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (driveOutput + (double) driveFeedforward));
-  _canTurnMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::PercentOutput, (turnOutput));
-  //_canTurnMotor.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute);
-  //_canTurnMotor.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, referenceState.angle.Degrees().value());
-}
-
-void SwerveModule::ZeroSensors() {
-  _canDriveMotor.SetSelectedSensorPosition(0);
-  _canTurnMotor.SetSelectedSensorPosition(0);
+  //SetDesiredAngle(state.angle);
 }
 
 void SwerveModule::SendSensorsToDash() {
-  int driveMotorID =  _canDriveMotor.GetDeviceID();
-  int turnEncoderID =  _canTurnEncoder.GetDeviceNumber();
+  if (_canTurnEncoder.GetPosition() > 180 || _canTurnEncoder.GetPosition() < -180) {
+    _canTurnEncoder.SetPositionToAbsolute();
+  }
+  
+  const int driveMotorID =  _canDriveMotor.GetDeviceID();
+  const int turnMotorID =  _canTurnMotor.GetDeviceID();
+  const int turnEncoderID =  _canTurnEncoder.GetDeviceNumber();
 
   frc::SmartDashboard::PutNumber("Drive motor "+std::to_string(driveMotorID)+ " velocity", _canDriveMotor.GetSelectedSensorVelocity());
-  frc::SmartDashboard::PutNumber("Turn encoder "+std::to_string(turnEncoderID)+ " position", _canTurnEncoder.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " position tics", _canTurnMotor.GetSensorCollection().GetIntegratedSensorPosition());
+  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " position degrees", GetAngle().Degrees().value());
+  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " target", _canTurnMotor.GetClosedLoopTarget());
+  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " error", _canTurnMotor.GetClosedLoopError());
+  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " selected sensor pos", _canTurnMotor.GetSelectedSensorPosition());
+  frc::SmartDashboard::PutNumber("Turn encoder "+std::to_string(turnEncoderID)+ " Abs position", _canTurnEncoder.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber("Turn encoder "+std::to_string(turnEncoderID)+ " position", _canTurnEncoder.GetPosition());
+}
+
+frc::Rotation2d SwerveModule::GetAngle() {
+  const double positionInTics = _canTurnMotor
+    .GetSensorCollection()
+    .GetIntegratedSensorPosition();
+  const double positionInRevolutions = positionInTics / TICS_PER_TURNING_WHEEL_REVOLUTION;
+  const double positionInDegrees = positionInRevolutions * 360;
+  return frc::Rotation2d(units::degree_t(positionInDegrees));
+}
+
+void SwerveModule::SetDesiredAngle(frc::Rotation2d angle) {
+  const double targetDegrees = angle.Degrees().value();
+  //const double targetRotations = targetDegrees / 360.0;
+  //const int targetTics =  targetRotations * TICS_PER_TURNING_WHEEL_REVOLUTION;
+  
+  _canTurnMotor.Set(TalonFXControlMode::Position, targetDegrees);
+}
+
+void SwerveModule::ZeroSensors() {
+  
 }

@@ -9,23 +9,25 @@
 #include <ctre/phoenix/sensors/CANCoder.h>
 
 void Robot::DriveWithJoystick(bool fieldRelative) {
+  const double deadband = 0.05;
+
   // Get the x speed. We are inverting this because Xbox controllers return
   // negative values when we push forward.
   const auto xSpeed = -m_xspeedLimiter.Calculate(
-                          frc::ApplyDeadband(m_controller.GetLeftY(), 0.02)) *
+                          frc::ApplyDeadband(m_controller.GetLeftY(), deadband)) *
                       SubDriveBase::kMaxSpeed;
   // Get the y speed or sideways/strafe speed. We are inverting this because
   // we want a positive value when we pull to the left. Xbox controllers
   // return positive values when you pull to the right by default.
   const auto ySpeed = -m_yspeedLimiter.Calculate(
-                          frc::ApplyDeadband(m_controller.GetLeftX(), 0.02)) *
+                          frc::ApplyDeadband(m_controller.GetLeftX(), deadband)) *
                       SubDriveBase::kMaxSpeed;
   // Get the rate of angular rotation. We are inverting this because we want a
   // positive value when we pull to the left (remember, CCW is positive in
   // mathematics). Xbox controllers return positive values when you pull to
   // the right by default.
   const auto rot = -m_rotLimiter.Calculate(
-                       frc::ApplyDeadband(m_controller.GetRightX(), 0.02)) *
+                       frc::ApplyDeadband(m_controller.GetRightX(), deadband)) *
                    SubDriveBase::kMaxAngularSpeed;
   m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative);
 }
