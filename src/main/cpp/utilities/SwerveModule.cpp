@@ -48,18 +48,18 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
 }
 
 void SwerveModule::SendSensorsToDash() {
-  const int driveMotorID =  _canDriveMotor.GetDeviceID();
-  const int turnMotorID =  _canTurnMotor.GetDeviceID();
-  const int turnEncoderID =  _canTurnEncoder.GetDeviceNumber();
+  std::string driveMotorName = "drive motor" + std::to_string(_canDriveMotor.GetDeviceID());
+  std::string turnMotorName = "turn motor" + std::to_string(_canTurnMotor.GetDeviceID());
+  std::string turnEncoderName = "turn encoder" + std::to_string(_canTurnEncoder.GetDeviceNumber());
 
-  frc::SmartDashboard::PutNumber("Drive motor "+std::to_string(driveMotorID)+ " velocity", _canDriveMotor.GetSelectedSensorVelocity());
-  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " position tics", _canTurnMotor.GetSensorCollection().GetIntegratedSensorPosition());
-  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " position degrees", GetAngle().Degrees().value());
-  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " target", _canTurnMotor.GetClosedLoopTarget());
-  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " error", _canTurnMotor.GetClosedLoopError());
-  frc::SmartDashboard::PutNumber("Turn motor "+std::to_string(turnMotorID)+ " selected sensor pos", _canTurnMotor.GetSelectedSensorPosition());
-  frc::SmartDashboard::PutNumber("Turn encoder "+std::to_string(turnEncoderID)+ " Abs position", _canTurnEncoder.GetAbsolutePosition());
-  frc::SmartDashboard::PutNumber("Turn encoder "+std::to_string(turnEncoderID)+ " position", _canTurnEncoder.GetPosition());
+  frc::SmartDashboard::PutNumber(driveMotorName + " velocity", _canDriveMotor.GetSelectedSensorVelocity());
+  frc::SmartDashboard::PutNumber(turnMotorName  + " position tics", _canTurnMotor.GetSensorCollection().GetIntegratedSensorPosition());
+  frc::SmartDashboard::PutNumber(turnMotorName  + " position degrees", GetAngle().Degrees().value());
+  frc::SmartDashboard::PutNumber(turnMotorName  + " target", _canTurnMotor.GetClosedLoopTarget());
+  frc::SmartDashboard::PutNumber(turnMotorName  + " error", _canTurnMotor.GetClosedLoopError());
+  frc::SmartDashboard::PutNumber(turnMotorName  + " selected sensor pos", _canTurnMotor.GetSelectedSensorPosition());
+  frc::SmartDashboard::PutNumber(turnEncoderName+ " Abs position", _canTurnEncoder.GetAbsolutePosition());
+  frc::SmartDashboard::PutNumber(turnEncoderName+ " position", _canTurnEncoder.GetPosition());
 }
 
 frc::Rotation2d SwerveModule::GetAngle() {

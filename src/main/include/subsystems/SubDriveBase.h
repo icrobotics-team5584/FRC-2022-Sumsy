@@ -43,15 +43,15 @@ class SubDriveBase : public frc2::SubsystemBase {
   frc::Translation2d m_backLeftLocation{-0.281_m, +0.281_m};
   frc::Translation2d m_backRightLocation{-0.281_m, -0.281_m};
 
-  const double FRONT_LEFT_MAG_OFFSET = 108.5;
-  const double FRONT_RIGHT_MAG_OFFSET = -136.05;
-  const double BACK_LEFT_MAG_OFFSET = -166.9;
-  const double BACK_RIGHT_MAG_OFFSET = 148.7;
+  const double FRONT_LEFT_MAG_OFFSET = 16.00;//-13.97;//-166.9;
+  const double FRONT_RIGHT_MAG_OFFSET = -136.14;//-111.30;//108.5;
+  const double BACK_LEFT_MAG_OFFSET = 108.63;//-149.68;//148.7;
+  const double BACK_RIGHT_MAG_OFFSET = -31.64;//-44.82;//-136.05;
 
   SwerveModule m_frontLeft{1, 2, 11, FRONT_LEFT_MAG_OFFSET};
-  SwerveModule m_frontRight{3, 4, 9, FRONT_RIGHT_MAG_OFFSET};
-  SwerveModule m_backLeft{5, 6, 12, BACK_LEFT_MAG_OFFSET};
-  SwerveModule m_backRight{7, 8, 10, BACK_RIGHT_MAG_OFFSET};
+  SwerveModule m_frontRight{7, 8, 10, FRONT_RIGHT_MAG_OFFSET};
+  SwerveModule m_backLeft{3, 4, 9, BACK_LEFT_MAG_OFFSET};
+  SwerveModule m_backRight{5, 6, 12, BACK_RIGHT_MAG_OFFSET};
 
   frc::AnalogGyro m_gyro{0};
 
