@@ -30,6 +30,7 @@ class SwerveModule {
   void SendSensorsToDash();
   void SetDesiredAngle(frc::Rotation2d angle);
   void SetDesiredVelocity(units::meters_per_second_t velocity);
+  void StopMotors();
   frc::Rotation2d GetAngle();
 
  private:

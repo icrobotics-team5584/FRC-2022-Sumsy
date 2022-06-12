@@ -26,7 +26,7 @@ class SubDriveBase : public frc2::SubsystemBase {
   void SyncSensors();
 
   static constexpr units::meters_per_second_t kMaxSpeed =
-      3.0_mps;  // 3 meters per second
+      0.5_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
       wpi::numbers::pi};
 
