@@ -23,7 +23,7 @@ class SubDriveBase : public frc2::SubsystemBase {
              
   void UpdateOdometry();
 
-  void ZeroSensors();
+  void SyncSensors();
 
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
@@ -43,10 +43,15 @@ class SubDriveBase : public frc2::SubsystemBase {
   frc::Translation2d m_backLeftLocation{-0.281_m, +0.281_m};
   frc::Translation2d m_backRightLocation{-0.281_m, -0.281_m};
 
-  SwerveModule m_frontLeft{1, 2, 11};
-  SwerveModule m_frontRight{3, 4, 9};
-  SwerveModule m_backLeft{5, 6, 12};
-  SwerveModule m_backRight{7, 8, 10};
+  const double FRONT_LEFT_MAG_OFFSET = 108.5;
+  const double FRONT_RIGHT_MAG_OFFSET = -136.05;
+  const double BACK_LEFT_MAG_OFFSET = -166.9;
+  const double BACK_RIGHT_MAG_OFFSET = 148.7;
+
+  SwerveModule m_frontLeft{1, 2, 11, FRONT_LEFT_MAG_OFFSET};
+  SwerveModule m_frontRight{3, 4, 9, FRONT_RIGHT_MAG_OFFSET};
+  SwerveModule m_backLeft{5, 6, 12, BACK_LEFT_MAG_OFFSET};
+  SwerveModule m_backRight{7, 8, 10, BACK_RIGHT_MAG_OFFSET};
 
   frc::AnalogGyro m_gyro{0};
 

@@ -2,15 +2,16 @@
 #include "frc/smartdashboard/SmartDashboard.h"
 #include <frc/MathUtil.h>
 
-SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnEncoderID) 
-                          : _canDriveMotor(canDriveMotorID), 
-                          _canTurnMotor(canTurnMotorID),
-                          _canTurnEncoder(canTurnEncoderID){
-
+SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID,
+                           int canTurnEncoderID, double cancoderMagOffset)
+    : _canDriveMotor(canDriveMotorID),
+      _canTurnMotor(canTurnMotorID),
+      _canTurnEncoder(canTurnEncoderID) {
   // Config CANCoder
   _canTurnEncoder.ConfigFactoryDefault();
   _canTurnEncoder.SetPositionToAbsolute();
   _canTurnEncoder.ConfigAbsoluteSensorRange(ctre::phoenix::sensors::AbsoluteSensorRange::Signed_PlusMinus180);
+  _canTurnEncoder.ConfigMagnetOffset(cancoderMagOffset);
 
   // Config Turning Motor
   _canTurnMotor.ConfigFactoryDefault();
@@ -84,10 +85,6 @@ void SwerveModule::SetDesiredVelocity(units::meters_per_second_t velocity) {
   const double revolutionsPer100MS = metersPer100MS / WHEEL_RADIUS.value();
   const double ticsPer100MS = revolutionsPer100MS * TICS_PER_MOTOR_REVOLUTION;
   _canDriveMotor.Set(TalonFXControlMode::Velocity, ticsPer100MS);
-}
-
-void SwerveModule::ZeroSensors() {
-  
 }
 
 void SwerveModule::SyncSensors() {

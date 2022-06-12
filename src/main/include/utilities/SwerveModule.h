@@ -23,10 +23,9 @@
 
 class SwerveModule {
  public:
-  SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnEncoderID);
+  SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnEncoderID, double cancoderMagOffset);
 
   void SetDesiredState(const frc::SwerveModuleState& state);
-  void ZeroSensors();
   void SyncSensors();
   void SendSensorsToDash();
   void SetDesiredAngle(frc::Rotation2d angle);

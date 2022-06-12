@@ -5,9 +5,7 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "subsystems/SubDriveBase.h"
 
-SubDriveBase::SubDriveBase() {
-  frc::SmartDashboard::PutNumber("set desired angle", 0);
-}
+SubDriveBase::SubDriveBase() = default;
 
 // This method will be called once per scheduler run
 void SubDriveBase::Periodic() {
@@ -36,7 +34,7 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
 }
 
 
-void SubDriveBase::ZeroSensors() {
+void SubDriveBase::SyncSensors() {
   m_frontLeft.SyncSensors();
   m_frontRight.SyncSensors();
   m_backLeft.SyncSensors();

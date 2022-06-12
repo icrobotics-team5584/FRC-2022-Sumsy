@@ -33,7 +33,7 @@ void Robot::DriveWithJoystick(bool fieldRelative) {
 }
 
 void Robot::RobotInit() {
-  m_swerve.ZeroSensors();
+  m_swerve.SyncSensors();
 
 }
 
