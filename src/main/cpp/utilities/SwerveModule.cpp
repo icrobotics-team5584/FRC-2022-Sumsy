@@ -20,6 +20,7 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnE
   _canTurnMotor.Config_kP(PID_SLOT_INDEX, TURN_P);
   _canTurnMotor.Config_kI(PID_SLOT_INDEX, TURN_I);
   _canTurnMotor.Config_kD(PID_SLOT_INDEX, TURN_D);
+  _canTurnMotor.ConfigSupplyCurrentLimit(CURRENT_LIMIT_CONFIG);
 
   // Config Driving Motor
   _canDriveMotor.ConfigFactoryDefault();
@@ -28,6 +29,7 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID, int canTurnE
   _canDriveMotor.Config_kI(PID_SLOT_INDEX, DRIVE_I);
   _canDriveMotor.Config_kD(PID_SLOT_INDEX, DRIVE_D);
   _canDriveMotor.Config_kF(PID_SLOT_INDEX, DRIVE_F);
+  _canTurnMotor.ConfigSupplyCurrentLimit(CURRENT_LIMIT_CONFIG);
 }
 
 void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState) {

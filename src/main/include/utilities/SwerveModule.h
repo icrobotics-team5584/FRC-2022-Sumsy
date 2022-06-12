@@ -39,6 +39,12 @@ class SwerveModule {
   const double TICS_PER_TURNING_WHEEL_REVOLUTION =
       TICS_PER_MOTOR_REVOLUTION * TURNING_GEAR_RATIO;
   const units::meter_t WHEEL_RADIUS = 0.0508_m;
+  const SupplyCurrentLimitConfiguration CURRENT_LIMIT_CONFIG {
+    true, // enabled?
+    20.0, // holding current limit when activated
+    40.0, // threshold to activate limiting
+    0.5   // seconds exceeded threshhold before activating
+  };
 
   const double TURN_P = 0.2;
   const double TURN_I = 0.0;
