@@ -38,12 +38,12 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   auto targetState = frc::SwerveModuleState::Optimize(referenceState, GetAngle());
 
   // Move target angle so we can cross over the 180 degree line without going the long way round
-  // frc::Rotation2d difference = targetState.angle - GetAngle();
-  // difference = frc::InputModulus(difference.Degrees(), -180_deg, 180_deg);
-  // targetState.angle = GetAngle() + difference;
+  auto difference = targetState.angle.Degrees() - GetAngle().Degrees();
+  difference = frc::InputModulus(difference, -180_deg, 180_deg);
+  auto targetAngle = GetAngle().Degrees() + difference;
 
   // Drive! These functions do some conversions and send targets to falcons
-  SetDesiredAngle(targetState.angle);
+  SetDesiredAngle(targetAngle);
   SetDesiredVelocity(targetState.speed);
 }
 
@@ -67,9 +67,8 @@ frc::Rotation2d SwerveModule::GetAngle() {
   return frc::Rotation2d(units::degree_t(positionInDegrees));
 }
 
-void SwerveModule::SetDesiredAngle(frc::Rotation2d angle) {
-  const double targetDegrees = angle.Degrees().value();
-  const double targetRotations = targetDegrees / 360.0;
+void SwerveModule::SetDesiredAngle(units::degree_t angle) {
+  const double targetRotations = angle.value() / 360.0;
   const int targetTics =  targetRotations * TICS_PER_TURNING_WHEEL_REVOLUTION;
   _canTurnMotor.Set(TalonFXControlMode::Position, targetTics);
 }
