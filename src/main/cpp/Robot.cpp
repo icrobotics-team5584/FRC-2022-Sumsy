@@ -9,7 +9,7 @@
 #include <ctre/phoenix/sensors/CANCoder.h>
 
 void Robot::DriveWithJoystick(bool fieldRelative) {
-  const double deadband = 0.05;
+  const double deadband = 0.1;
 
   // Get the x speed. We are inverting this because Xbox controllers return
   // negative values when we push forward.
@@ -19,7 +19,7 @@ void Robot::DriveWithJoystick(bool fieldRelative) {
   // Get the y speed or sideways/strafe speed. We are inverting this because
   // we want a positive value when we pull to the left. Xbox controllers
   // return positive values when you pull to the right by default.
-  const auto ySpeed = -m_yspeedLimiter.Calculate(
+  const auto ySpeed = m_yspeedLimiter.Calculate(
                           frc::ApplyDeadband(m_controller.GetLeftX(), deadband)) *
                       SubDriveBase::kMaxSpeed;
   // Get the rate of angular rotation. We are inverting this because we want a
@@ -87,7 +87,7 @@ void Robot::TeleopInit() {
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {
-  DriveWithJoystick(false);
+  DriveWithJoystick(true);
 }
 
 /**

@@ -4,8 +4,10 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "subsystems/SubDriveBase.h"
+#include <frc/MathUtil.h>
 
-SubDriveBase::SubDriveBase() = default;
+SubDriveBase::SubDriveBase(){
+}
 
 // This method will be called once per scheduler run
 void SubDriveBase::Periodic() {
@@ -20,7 +22,7 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
                        units::radians_per_second_t rot, bool fieldRelative) {
   auto states = m_kinematics.ToSwerveModuleStates(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
+                          xSpeed, ySpeed, rot, GetHeading())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
@@ -33,10 +35,14 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
   m_backRight.SetDesiredState(br);
 }
 
-
 void SubDriveBase::SyncSensors() {
   m_frontLeft.SyncSensors();
   m_frontRight.SyncSensors();
   m_backLeft.SyncSensors();
   m_backRight.SyncSensors();
+  m_gyro.Calibrate();
+}
+
+frc::Rotation2d SubDriveBase::GetHeading() {
+  return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
 }

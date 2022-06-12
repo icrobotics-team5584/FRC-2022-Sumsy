@@ -6,6 +6,7 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <frc/AnalogGyro.h>
+#include <frc/ADXRS450_Gyro.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
@@ -22,11 +23,11 @@ class SubDriveBase : public frc2::SubsystemBase {
              bool fieldRelative);
              
   void UpdateOdometry();
-
   void SyncSensors();
+  frc::Rotation2d GetHeading();
 
   static constexpr units::meters_per_second_t kMaxSpeed =
-      0.5_mps;  // 3 meters per second
+      3_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
       wpi::numbers::pi};
 
@@ -38,10 +39,10 @@ class SubDriveBase : public frc2::SubsystemBase {
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  frc::Translation2d m_frontLeftLocation{+0.281_m, +0.281_m};
-  frc::Translation2d m_frontRightLocation{+0.281_m, -0.281_m};
-  frc::Translation2d m_backLeftLocation{-0.281_m, +0.281_m};
-  frc::Translation2d m_backRightLocation{-0.281_m, -0.281_m};
+  frc::Translation2d m_frontLeftLocation{+0.281_m, -0.281_m};
+  frc::Translation2d m_frontRightLocation{+0.281_m, +0.281_m};
+  frc::Translation2d m_backLeftLocation{-0.281_m, -0.281_m};
+  frc::Translation2d m_backRightLocation{-0.281_m, +0.281_m};
 
   const double FRONT_LEFT_MAG_OFFSET = 16.00;//-13.97;//-166.9;
   const double FRONT_RIGHT_MAG_OFFSET = -136.14;//-111.30;//108.5;
@@ -53,7 +54,7 @@ class SubDriveBase : public frc2::SubsystemBase {
   SwerveModule m_backLeft{3, 4, 9, BACK_LEFT_MAG_OFFSET};
   SwerveModule m_backRight{5, 6, 12, BACK_RIGHT_MAG_OFFSET};
 
-  frc::AnalogGyro m_gyro{0};
+  frc::ADXRS450_Gyro m_gyro;
 
   frc::SwerveDriveKinematics<4> m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
