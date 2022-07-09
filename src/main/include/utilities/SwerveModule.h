@@ -32,6 +32,8 @@ class SwerveModule {
   void SetDesiredVelocity(units::meters_per_second_t velocity);
   void StopMotors();
   frc::Rotation2d GetAngle();
+  units::meters_per_second_t GetSpeed();
+  frc::SwerveModuleState GetState();
 
  private:
   const int TICS_PER_MOTOR_REVOLUTION = 2048;

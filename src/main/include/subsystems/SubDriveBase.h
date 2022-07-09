@@ -6,11 +6,13 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <frc/AnalogGyro.h>
-#include <frc/ADXRS450_Gyro.h>
+#include <AHRS.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <wpi/numbers>
+#include <frc/smartdashboard/Field2d.h>
 
 #include "utilities/SwerveModule.h"
 
@@ -54,12 +56,19 @@ class SubDriveBase : public frc2::SubsystemBase {
   SwerveModule m_backLeft{3, 4, 9, BACK_LEFT_MAG_OFFSET};
   SwerveModule m_backRight{5, 6, 12, BACK_RIGHT_MAG_OFFSET};
 
-  frc::ADXRS450_Gyro m_gyro;
+  AHRS m_gyro{frc::SerialPort::kMXP};
 
   frc::SwerveDriveKinematics<4> m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, m_gyro.GetRotation2d()};
+
+  frc::SwerveDrivePoseEstimator<4> _poseEstimator{
+      frc::Rotation2d(), frc::Pose2d(), m_kinematics, 
+      {0.0,0.0,0.0}, {0.00}, {0.0,0.0,0.0} 
+  };
+
+  frc::Field2d _fieldDisplay;
 };
 
