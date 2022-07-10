@@ -8,6 +8,7 @@
 #include <frc/XboxController.h>
 #include "subsystems/SubIntake.h"
 #include "commands/CmdIntake.h"
+#include "commands/CmdOuttake.h"
 /**
  * This class is where the bulk of the robot should be declared.  Since
  * Command-based is a "declarative" paradigm, very little robot logic should
@@ -29,5 +30,6 @@ class RobotContainer {
 
   SubIntake _subIntake;
   CmdIntake _cmdIntake{&_subIntake};
+  CmdOuttake _cmdOuttake{&_subIntake};
 
 };

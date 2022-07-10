@@ -16,6 +16,9 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
   frc2::JoystickButton btnIntake{&_xboxRemote, frc::XboxController::Button::kA};
   btnIntake.WhileHeld(&_cmdIntake);
+
+  frc2::JoystickButton btnOuttake{&_xboxRemote, frc::XboxController::Button::kB};
+  btnOuttake.WhileHeld(&_cmdOuttake);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
