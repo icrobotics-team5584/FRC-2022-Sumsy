@@ -10,16 +10,16 @@
 
 class SubIntake : public frc2::SubsystemBase {
  public:
-  SubIntake();
-
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
   void Periodic() override;
+  void Intake();
+  void Outtake();
+  void Stop();
+  void Extend();
+  void Retract();
 
  private:
   rev::CANSparkMax _spmIntakeSpin{9, rev::CANSparkMaxLowLevel::MotorType::kBrushless}; 
-  frc::DoubleSolenoid _solntakeDeploy {frc::PneumaticsModuleType::CTREPCM, 1, 2};
+  frc::DoubleSolenoid _solIntakeDeploy {frc::PneumaticsModuleType::CTREPCM, 1, 2};
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 };
