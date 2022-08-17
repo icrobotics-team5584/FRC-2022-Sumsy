@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+#include "subsystems/CmdDeployPickup.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -13,6 +14,7 @@ RobotContainer::RobotContainer(){
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
+  _rightBumber.WhileHeld(CmdDeployPickup{});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

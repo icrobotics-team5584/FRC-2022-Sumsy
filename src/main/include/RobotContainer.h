@@ -5,6 +5,8 @@
 #pragma once
 
 #include <frc2/command/Command.h>
+#include <frc/XboxController.h>
+#include <frc2/command/button/JoystickButton.h>
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -23,4 +25,6 @@ class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   void ConfigureButtonBindings();
+  frc::XboxController _controller {1};
+  frc2::JoystickButton _rightBumber {&_controller, frc::XboxController::Button::kRightBumper};
 };
