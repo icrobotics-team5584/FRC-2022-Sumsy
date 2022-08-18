@@ -32,6 +32,8 @@ class ICSparkMax : public rev::CANSparkMax {
 
   rev::ControlType GetControlType() { return _controlType; };
 
+  void StopMotor() override;
+
  private:
   double _target;
   Type _type;

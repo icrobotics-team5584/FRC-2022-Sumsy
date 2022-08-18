@@ -14,7 +14,7 @@
  * they are needed.
  */
 
-namespace can {
+namespace canid {
   constexpr int tfxDriveBaseFrontRight = 1; //check what prefix it should have with liam
   constexpr int tfxDriveBaseBackRight = 2;
   constexpr int tfxDriveBaseFrontLeft = 3;
@@ -23,6 +23,7 @@ namespace can {
   constexpr int spmIntake = 99;
   constexpr int spmShooter1 = 99;
   constexpr int spmShooter2 = 99;
+  constexpr int tfxElevator = 5;
   
 }
 

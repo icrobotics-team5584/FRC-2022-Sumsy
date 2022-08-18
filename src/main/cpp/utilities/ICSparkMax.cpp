@@ -4,16 +4,11 @@
 
 ICSparkMax::ICSparkMax(int deviceID, Type type)
     : rev::CANSparkMax(deviceID,
-                       rev::CANSparkMaxLowLevel::MotorType::kBrushless),
-      _simDeviceSim("SPARK MAX", deviceID) {
+                       rev::CANSparkMaxLowLevel::MotorType::kBrushless) {
     _type = type;
     RestoreFactoryDefaults();
     SetSmartCurrentLimit(type == Type::NEO ? NEO_CURRENT_LIMIT
                                            : NEO_550_CURRENT_LIMIT);
-
-    if (frc::RobotBase::IsSimulation()) {
-        _simNotifier.StartPeriodic(20_ms);
-    }
 };
 
 void ICSparkMax::SetPIDF(double P, double I, double D, double F) {
@@ -64,9 +59,8 @@ units::volt_t ICSparkMax::GetSimVoltage() {
             break;
         case rev::ControlType::kSmartVelocity:
             break;
-        default:
-            return units::volt_t{Get()};
     }
+    return units::volt_t{Get()};
 }
 
 bool ICSparkMax::GoingForward() {
@@ -87,4 +81,11 @@ bool ICSparkMax::GoingBackward() {
     } else {
         return Get() < 0;
     }
+}
+
+
+void ICSparkMax::StopMotor() {
+    _controlType = rev::ControlType::kDutyCycle;
+    _target = 0;
+    CANSparkMax::StopMotor();
 }
