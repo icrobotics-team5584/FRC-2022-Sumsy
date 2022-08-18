@@ -3,9 +3,13 @@
 #include <rev/CANSparkMax.h>
 #include <units/length.h>
 #include <units/velocity.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
 #include <frc/simulation/SimDeviceSim.h>
 #include <hal/SimDevice.h>
 #include <frc/Notifier.h>
+#include <frc/controller/ProfiledPIDController.h>
+#include <frc/controller/PIDController.h>
 
 class ICSparkMax : public rev::CANSparkMax {
  public:
@@ -43,4 +47,7 @@ class ICSparkMax : public rev::CANSparkMax {
 
   rev::SparkMaxPIDController _pidController{GetPIDController()};
   rev::SparkMaxRelativeEncoder _encoder{GetEncoder()};
+
+  // frc::ProfiledPIDController<units::meters> _simSmartMotionController{0,0,0,{1.75_mps, 0.75_mps_sq},20_ms};
+  frc::PIDController _simVelocityController{0,0,0};
 };

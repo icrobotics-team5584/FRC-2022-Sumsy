@@ -27,7 +27,7 @@ class SubElevator : public frc2::SubsystemBase {
   ICSparkMax _elevator{canid::tfxElevator, ICSparkMax::Type::NEO};
 
   // Constants
-  const double P = 0.1;
+  const double P = 0.5;
   const double I = 0.0;
   const double D = 0.0;
   const double F = 0.1;

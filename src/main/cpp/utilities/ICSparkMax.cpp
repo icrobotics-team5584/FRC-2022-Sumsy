@@ -16,6 +16,9 @@ void ICSparkMax::SetPIDF(double P, double I, double D, double F) {
     _pidController.SetI(I);
     _pidController.SetD(D);
     _pidController.SetFF(F);
+
+    // _simSmartMotionController.SetPID(P, I, D);
+    _simVelocityController.SetPID(P, I, D);
 }
 
 void ICSparkMax::SetPositionTarget(double target) {
@@ -42,12 +45,16 @@ units::volt_t ICSparkMax::GetSimVoltage() {
     switch (_controlType) {
         case rev::ControlType::kDutyCycle:
             return units::volt_t{Get()};
+
         case rev::ControlType::kVelocity:
-            return units::volt_t{(_target * _encoder.GetVelocityConversionFactor() / 5676.0) * 12};
+            return units::volt_t{_simVelocityController.Calculate(_encoder.GetPosition(), _target)};
+
         case rev::ControlType::kVoltage:
             return units::volt_t{_target};
+
         case rev::ControlType::kPosition:
             break;
+
         case rev::ControlType::kSmartMotion:
             if (GoingForward()) {
                 return 12_V;
@@ -55,10 +62,18 @@ units::volt_t ICSparkMax::GetSimVoltage() {
                 return -12_V;
             } 
             return 0_V;
+
+            /*
+            const auto measurement = units::turn_t{_encoder.GetPosition()};
+            const auto goal = units::turn_t{_target};
+            return units::volt_t{_simSmartMotionController.Calculate(measurement, goal)};
+            */
         case rev::ControlType::kCurrent:
             break;
+
         case rev::ControlType::kSmartVelocity:
             break;
+
     }
     return units::volt_t{Get()};
 }

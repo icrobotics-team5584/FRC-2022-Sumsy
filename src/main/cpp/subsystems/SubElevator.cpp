@@ -8,7 +8,6 @@ SubElevator::SubElevator() {
     _elevator.SetVelocityConversionFactor(ELEVATOR_VEL_CONVERSION_FACTOR);
 }
 
-// This method will be called once per scheduler run
 void SubElevator::Periodic() {}
 
 void SubElevator::DriveTo(units::meter_t height) {
