@@ -35,13 +35,20 @@ void ICSparkMax::SetTarget(double target, rev::ControlType controlType,
     SyncSimPID();
 }
 
+void ICSparkMax::Set(double speed) {
+    if (frc::RobotBase::IsSimulation()) {
+        SetTarget(speed, rev::ControlType::kDutyCycle);
+    } 
+    CANSparkMax::Set(speed);
+}
+
 units::volt_t ICSparkMax::GetSimVoltage() {
     auto targState = _simSmartMotionProfile.Calculate(_timeSinceSmartMotionStart);
     units::volt_t output = 0_V;
 
     switch (_controlType) {
         case rev::ControlType::kDutyCycle:
-            output = units::volt_t{Get()};
+            output = units::volt_t{_target * 12};
             break;
 
         case rev::ControlType::kVelocity:

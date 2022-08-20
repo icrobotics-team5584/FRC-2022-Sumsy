@@ -42,7 +42,8 @@ void SubElevator::DumbDriveTo(units::meter_t height) {
 }
 
 void SubElevator::DumbDriveAt(double power) {
-    _elevator.SetTarget(power, rev::ControlType::kDutyCycle);
+    // _elevator.SetTarget(power, rev::ControlType::kDutyCycle);
+    _elevator.Set(power);
 }
 
 void SubElevator::Stop() {

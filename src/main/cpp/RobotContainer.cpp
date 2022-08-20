@@ -15,8 +15,8 @@ RobotContainer::RobotContainer(){
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
-  _controller.A.WhenPressed([=]{SubElevator::GetInstance().DriveAt(0.02_mps);});
-  _controller.B.WhenPressed([=]{SubElevator::GetInstance().DriveAt(-0.02_mps);});
+  _controller.A.WhenPressed([=]{SubElevator::GetInstance().DumbDriveAt(0.5);});
+  _controller.B.WhenPressed([=]{SubElevator::GetInstance().DumbDriveAt(-0.5);});
   _controller.X.WhenPressed([=]{SubElevator::GetInstance().Stop();});
 }
 
