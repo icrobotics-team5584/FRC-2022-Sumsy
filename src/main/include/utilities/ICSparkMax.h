@@ -17,7 +17,7 @@ class ICSparkMax : public rev::CANSparkMax {
 
   ICSparkMax(int deviceID, Type type);
 
-  void SetPIDF(double P, double I, double D, double F);
+  void SetPIDF(double P, double I, double D, double F = 0.0);
 
   void SetTarget(double target, rev::ControlType controlType, int pidSlot = 0,
                  double arbFeedForward = 0.0,

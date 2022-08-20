@@ -4,10 +4,12 @@
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/velocity.h>
+#include <units/acceleration.h>
 #include <rev/CANSparkMax.h>
 #include "utilities/ICSparkMax.h"
 #include "Constants.h"
 #include <frc/simulation/ElevatorSim.h>
+#include <frc/controller/ElevatorFeedforward.h>
 
 class SubElevator : public frc2::SubsystemBase {
  public:
@@ -31,12 +33,16 @@ class SubElevator : public frc2::SubsystemBase {
   ICSparkMax _elevator{canid::tfxElevator, ICSparkMax::Type::NEO};
 
   // Constants
-  const double P = 20.0;
-  const double I = 0.0;
-  const double D = 0.0;
-  const double F = 0.0;
+  double P = 0.0;
+  double I = 0.0;
+  double D = 0.0;
+  frc::ElevatorFeedforward<units::meters> _elevatorFF {
+    0.0_V,
+    0.005_V,
+    12_V/0.3_mps
+  };
 
-  const double ELEVATOR_GEARING = 30.0;
+  const double ELEVATOR_GEARING = 20.0;
   const units::meter_t DRUM_RADIUS = 0.05_m;
   const double ELEVATOR_POS_CONVERSION_FACTOR = ELEVATOR_GEARING * DRUM_RADIUS.value(); // rotations to meters
   const double ELEVATOR_VEL_CONVERSION_FACTOR = ELEVATOR_POS_CONVERSION_FACTOR * 60; // RPM to meters per second

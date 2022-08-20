@@ -13,11 +13,11 @@ ICSparkMax::ICSparkMax(int deviceID, Type type)
                                            : NEO_550_CURRENT_LIMIT);
 };
 
-void ICSparkMax::SetPIDF(double P, double I, double D, double F) {
+void ICSparkMax::SetPIDF(double P, double I, double D, double staticFF) {
     _pidController.SetP(P);
     _pidController.SetI(I);
     _pidController.SetD(D);
-    _pidController.SetFF(F);
+    _pidController.SetFF(staticFF);
 
     SyncSimPID();
 }
@@ -45,6 +45,12 @@ units::volt_t ICSparkMax::GetSimVoltage() {
             break;
 
         case rev::ControlType::kVelocity:
+            output = units::volt_t { 
+                _simController.Calculate(_encoder.GetVelocity(),_target) 
+                + _pidController.GetFF() + _arbFeedForward
+            };
+            break;
+
         case rev::ControlType::kPosition:
             output = units::volt_t { 
                 _simController.Calculate(_encoder.GetPosition(),_target) 

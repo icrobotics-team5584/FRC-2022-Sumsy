@@ -15,13 +15,9 @@ RobotContainer::RobotContainer(){
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
-  _controller.A.WhenPressed([=]{SubElevator::GetInstance().DumbDriveTo(1.4_m);});
-  _controller.B.WhenPressed([=]{SubElevator::GetInstance().DumbDriveTo(0_m);});
-  _controller.X.WhenPressed([=]{SubElevator::GetInstance().DriveAt(0.5_mps);});
-  _controller.Y.WhenPressed([=]{SubElevator::GetInstance().DriveWith(6_V);});
-  _controller.LeftBumper.WhenPressed([=]{SubElevator::GetInstance().DumbDriveTo(1.4_m);});
-  _controller.RightBumper.WhenPressed([=]{SubElevator::GetInstance().DumbDriveAt(0.7);});
-  _controller.Back.WhenPressed([=]{SubElevator::GetInstance().Stop();});
+  _controller.A.WhenPressed([=]{SubElevator::GetInstance().DriveAt(0.02_mps);});
+  _controller.B.WhenPressed([=]{SubElevator::GetInstance().DriveAt(-0.02_mps);});
+  _controller.X.WhenPressed([=]{SubElevator::GetInstance().Stop();});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
