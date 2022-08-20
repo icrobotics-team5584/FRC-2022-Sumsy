@@ -16,17 +16,16 @@
       "/LiveWindow/Ungrouped/class frc2::SubsystemBase": "Subsystem",
       "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
       "/SmartDashboard/field": "Field2d"
-    },
-    "windows": {
-      "/SmartDashboard/field": {
-        "window": {
-          "visible": true
-        }
-      }
     }
   },
   "NetworkTables": {
     "SmartDashboard": {
+      "Elevator": {
+        "open": true
+      },
+      "ICSparkMax": {
+        "open": true
+      },
       "open": true
     }
   },
@@ -34,7 +33,12 @@
     "Plot <0>": {
       "plots": [
         {
-          "height": 262,
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 434,
           "series": [
             {
               "color": [
@@ -43,11 +47,55 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/elevator pos"
+              "id": "NT:/SmartDashboard/Elevator/pos"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/velocity"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/voltage"
             }
           ]
         }
       ]
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 295,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/voltage"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

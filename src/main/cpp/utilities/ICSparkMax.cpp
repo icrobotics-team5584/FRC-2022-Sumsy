@@ -1,6 +1,8 @@
 #include "utilities/ICSparkMax.h"
 
 #include <frc/RobotBase.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <units/voltage.h>
 
 ICSparkMax::ICSparkMax(int deviceID, Type type)
     : rev::CANSparkMax(deviceID,
@@ -17,90 +19,108 @@ void ICSparkMax::SetPIDF(double P, double I, double D, double F) {
     _pidController.SetD(D);
     _pidController.SetFF(F);
 
-    // _simSmartMotionController.SetPID(P, I, D);
-    _simVelocityController.SetPID(P, I, D);
+    SyncSimPID();
 }
 
-void ICSparkMax::SetPositionTarget(double target) {
+void ICSparkMax::SetTarget(double target, rev::ControlType controlType,
+                           int pidSlot, double arbFeedForward,
+                           rev::CANPIDController::ArbFFUnits arbFFUnits) {
     _target = target;
-    _controlType = rev::ControlType::kSmartMotion;
-    _pidController.SetReference(target, rev::ControlType::kSmartMotion);
-}
+    _pidSlot = pidSlot;
+    _arbFeedForward = arbFeedForward;
+    _arbFFUnits = arbFFUnits;
+    SetInternalControlType(controlType);
+    _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward, arbFFUnits);
 
-void ICSparkMax::SetVelocityTarget(double target) {
-    _target = target;
-    _controlType = rev::ControlType::kVelocity;
-    _pidController.SetReference(target, rev::ControlType::kVelocity);
-}
-
-void ICSparkMax::SetPositionConversionFactor(double factor) {
-    _encoder.SetPositionConversionFactor(factor);
-}
-
-void ICSparkMax::SetVelocityConversionFactor(double factor) {
-    _encoder.SetVelocityConversionFactor(factor);
+    SyncSimPID();
 }
 
 units::volt_t ICSparkMax::GetSimVoltage() {
+    auto targState = _simSmartMotionProfile.Calculate(_timeSinceSmartMotionStart);
+    units::volt_t output = 0_V;
+
     switch (_controlType) {
         case rev::ControlType::kDutyCycle:
-            return units::volt_t{Get()};
+            output = units::volt_t{Get()};
+            break;
 
         case rev::ControlType::kVelocity:
-            return units::volt_t{_simVelocityController.Calculate(_encoder.GetPosition(), _target)};
+        case rev::ControlType::kPosition:
+            output = units::volt_t { 
+                _simController.Calculate(_encoder.GetPosition(),_target) 
+                + _pidController.GetFF() + _arbFeedForward
+            };
+            break;
 
         case rev::ControlType::kVoltage:
-            return units::volt_t{_target};
-
-        case rev::ControlType::kPosition:
+            output = units::volt_t{_target};
             break;
 
         case rev::ControlType::kSmartMotion:
-            if (GoingForward()) {
-                return 12_V;
-            } else if (GoingBackward()) {
-                return -12_V;
-            } 
-            return 0_V;
+            frc::SmartDashboard::PutNumber("ICSparkMax/SM timer ms", _timeSinceSmartMotionStart.value());
+            frc::SmartDashboard::PutNumber("ICSparkMax/SM profile targ vel", targState.velocity.value()); 
+            frc::SmartDashboard::PutNumber("ICSparkMax/SM profile targ pos", targState.position.value()); 
+            output = units::volt_t{
+                _simController.Calculate(
+                    _encoder.GetVelocity(), 
+                    _simSmartMotionProfile.Calculate(_timeSinceSmartMotionStart)
+                        .velocity
+                        .value()
+                )
+            };
+            break;
 
-            /*
-            const auto measurement = units::turn_t{_encoder.GetPosition()};
-            const auto goal = units::turn_t{_target};
-            return units::volt_t{_simSmartMotionController.Calculate(measurement, goal)};
-            */
         case rev::ControlType::kCurrent:
             break;
 
         case rev::ControlType::kSmartVelocity:
             break;
-
     }
-    return units::volt_t{Get()};
+    return std::clamp(output, -12_V, 12_V);
 }
-
-bool ICSparkMax::GoingForward() {
-    if (_controlType == rev::ControlType::kSmartMotion) {
-        return _encoder.GetPosition() < _target;
-    } else if (_controlType == rev::ControlType::kVelocity) {
-        return _target > 0;
-    } else {
-        return Get() > 0;
-    }
-}
-
-bool ICSparkMax::GoingBackward() {
-    if (_controlType == rev::ControlType::kSmartMotion) {
-        return _encoder.GetPosition() > _target;
-    } else if (_controlType == rev::ControlType::kVelocity) {
-        return _target < 0;
-    } else {
-        return Get() < 0;
-    }
-}
-
 
 void ICSparkMax::StopMotor() {
-    _controlType = rev::ControlType::kDutyCycle;
     _target = 0;
+    SetInternalControlType(rev::ControlType::kDutyCycle);
     CANSparkMax::StopMotor();
+}
+
+void ICSparkMax::SetInternalControlType(rev::ControlType controlType) {
+    _controlType = controlType;
+    _simControlMode.Set((int)_controlType);
+}
+
+void ICSparkMax::UpdateSimEncoder(double position) {
+    _encoder.SetPosition(position);
+    _simVelocity.Set(position - _prevEncoderPos);
+    _prevEncoderPos = position;
+}
+
+void ICSparkMax::SyncSimPID() {
+    if (frc::RobotBase::IsReal()) return;
+
+    _simController.SetP(_pidController.GetP());
+    _simController.SetI(_pidController.GetI());
+    _simController.SetD(_pidController.GetD());
+    _simController.SetIntegratorRange(-_pidController.GetIMaxAccum(), _pidController.GetIMaxAccum());
+
+    if (_controlType == rev::ControlType::kSmartMotion) {
+        frc::TrapezoidProfile<units::meters>::Constraints constrainsts = {
+            units::meters_per_second_t{_pidController.GetSmartMotionMaxVelocity()},
+            units::meters_per_second_squared_t{_pidController.GetSmartMotionMaxAccel()}
+        };
+
+        _simSmartMotionProfile = {
+            constrainsts,
+            {units::meter_t{_target}, 0_mps},
+            {units::meter_t{_encoder.GetPosition()}, units::meters_per_second_t{_encoder.GetVelocity()}} 
+        };
+
+        _smartMotionProfileNotifier.StartPeriodic(20_ms);
+
+    } else {
+        _smartMotionProfileNotifier.Stop();
+        _timeSinceSmartMotionStart = 0_ms;
+    }
+
 }
