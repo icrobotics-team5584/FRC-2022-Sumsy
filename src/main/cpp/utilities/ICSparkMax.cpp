@@ -17,14 +17,12 @@ ICSparkMax::ICSparkMax(int deviceID, Type type)
 };
 
 void ICSparkMax::SetTarget(double target, rev::ControlType controlType,
-                           int pidSlot, double arbFeedForward,
-                           rev::CANPIDController::ArbFFUnits arbFFUnits) {
+                           int pidSlot, double arbFeedForward) {
     _target = target;
     _pidSlot = pidSlot;
     _arbFeedForward = arbFeedForward;
-    _arbFFUnits = arbFFUnits;
     SetInternalControlType(controlType);
-    _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward, arbFFUnits);
+    _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward);
 
     SyncSimPID();
 }
@@ -41,6 +39,10 @@ void ICSparkMax::Set(double speed) {
         SetTarget(speed, rev::ControlType::kDutyCycle);
     } 
     CANSparkMax::Set(speed);
+}
+
+void ICSparkMax::SetVoltage(units::volt_t output) {
+    SetTarget(output.value(), rev::ControlType::kVoltage);
 }
 
 units::volt_t ICSparkMax::GetSimVoltage() {

@@ -8,11 +8,9 @@ SubElevator::SubElevator() {
     _elevator.GetPIDControllerRef().SetD(D);
     _elevator.GetEncoderRef().SetPositionConversionFactor(ELEVATOR_POS_CONVERSION_FACTOR);
     _elevator.GetEncoderRef().SetVelocityConversionFactor(ELEVATOR_VEL_CONVERSION_FACTOR);
-    _elevator.GetPIDControllerRef().SetOutputRange(-1, 1);
-    _elevator.GetPIDControllerRef().SetSmartMotionMaxAccel(6.1);
-    _elevator.GetPIDControllerRef().SetSmartMotionMaxVelocity(1.5);
-    _elevator.GetPIDControllerRef().SetSmartMotionMinOutputVelocity(0);
-    _elevator.GetPIDControllerRef().SetSmartMotionAllowedClosedLoopError(0.005);
+    _elevator.GetPIDControllerRef().SetSmartMotionMaxAccel(maxAcceleration.value());
+    _elevator.GetPIDControllerRef().SetSmartMotionMaxVelocity(maxVelocity.value());
+    _elevator.GetPIDControllerRef().SetSmartMotionAllowedClosedLoopError(tolerance.value());
 
     frc::SmartDashboard::PutNumber("Elevator/P", P);
     frc::SmartDashboard::PutNumber("Elevator/I", I);
@@ -46,16 +44,8 @@ void SubElevator::DriveWith(units::volt_t voltage) {
     _elevator.SetTarget(voltage.value(), rev::ControlType::kVoltage);
 }
 
-void SubElevator::DumbDriveTo(units::meter_t height) {
-    _elevator.SetTarget(height.value(), rev::ControlType::kPosition);
-}
-
-void SubElevator::DumbDriveAt(double power) {
-    _elevator.Set(power);
-}
-
 void SubElevator::Stop() {
-    _elevator.StopMotor();
+    _elevator.Set(0);
 }
 
 void SubElevator::SimulationPeriodic() {

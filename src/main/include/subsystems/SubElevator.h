@@ -21,8 +21,6 @@ class SubElevator : public frc2::SubsystemBase {
   void DriveTo(units::meter_t height);
   void DriveAt(units::meters_per_second_t velocity);
   void DriveWith(units::volt_t voltage);
-  void DumbDriveTo(units::meter_t height);
-  void DumbDriveAt(double power);
 
   void Stop();
 
@@ -41,6 +39,9 @@ class SubElevator : public frc2::SubsystemBase {
     0.005_V,      // kG : Voltage to overcome gravity
     12_V/0.3_mps  // kV : 12V / how fast elevator travels at 12V
   };
+  units::meters_per_second_squared_t maxAcceleration = 6.1_mps_sq;
+  units::meters_per_second_t maxVelocity = 1.5_mps;
+  units::meter_t tolerance = 0.005_m;
 
   const double ELEVATOR_GEARING = 20.0;
   const units::meter_t DRUM_RADIUS = 0.05_m;
