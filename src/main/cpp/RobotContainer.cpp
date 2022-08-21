@@ -4,6 +4,7 @@
 
 #include "RobotContainer.h"
 #include <subsystems/SubElevator.h>
+#include <frc2/command/button/JoystickButton.h>
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -15,9 +16,15 @@ RobotContainer::RobotContainer(){
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
-  _controller.A.WhenPressed([=]{SubElevator::GetInstance().DumbDriveAt(0.5);});
-  _controller.B.WhenPressed([=]{SubElevator::GetInstance().DumbDriveAt(-0.5);});
-  _controller.X.WhenPressed([=]{SubElevator::GetInstance().Stop();});
+  using btn = frc2::JoystickButton;
+  using btnId = frc::XboxController::Button;
+  using AxsId = frc::XboxController::Axis;
+
+  btn{&_controller, btnId::kA}.WhenPressed([=]{SubElevator::GetInstance().DriveTo(1.4_m);});
+  btn{&_controller, btnId::kB}.WhenPressed([=]{SubElevator::GetInstance().DriveTo(0_m);});
+  btn{&_controller, btnId::kX}.WhenPressed([=]{SubElevator::GetInstance().DriveWith(12_V);});
+  btn{&_controller, btnId::kY}.WhenPressed([=]{SubElevator::GetInstance().DriveWith(-12_V);});
+  btn{&_controller, btnId::kLeftBumper}.WhenPressed([=]{SubElevator::GetInstance().Stop();});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

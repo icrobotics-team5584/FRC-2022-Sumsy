@@ -17,19 +17,18 @@ class ICSparkMax : public rev::CANSparkMax {
 
   ICSparkMax(int deviceID, Type type);
 
-  void SetPIDF(double P, double I, double D, double F = 0.0);
-
   void SetTarget(double target, rev::ControlType controlType, int pidSlot = 0,
                  double arbFeedForward = 0.0,
                  rev::CANPIDController::ArbFFUnits arbFFUnits =
                      rev::CANPIDController::ArbFFUnits::kVoltage);
+  double GetTarget();
 
   units::volt_t GetSimVoltage();
   void SyncSimPID();
-  void UpdateSimEncoder(double position);
+  void UpdateSimEncoder(double position, double velocity);
 
   rev::SparkMaxRelativeEncoder& GetEncoderRef() { return _encoder; };
-  rev::SparkMaxPIDController& GetPIDControllerRed() { return _pidController; };
+  rev::SparkMaxPIDController& GetPIDControllerRef() { return _pidController; };
 
   rev::ControlType GetControlType() { return _controlType; };
 

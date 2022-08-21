@@ -1,26 +1,20 @@
 #include "utilities/ICSparkMax.h"
 
 #include <frc/RobotBase.h>
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <units/voltage.h>
+#include <iostream>
 
 ICSparkMax::ICSparkMax(int deviceID, Type type)
     : rev::CANSparkMax(deviceID,
                        rev::CANSparkMaxLowLevel::MotorType::kBrushless) {
     _type = type;
     RestoreFactoryDefaults();
-    SetSmartCurrentLimit(type == Type::NEO ? NEO_CURRENT_LIMIT
-                                           : NEO_550_CURRENT_LIMIT);
+    if (type == Type::NEO) {
+        SetSmartCurrentLimit(NEO_CURRENT_LIMIT);
+    } else {
+        SetSmartCurrentLimit(NEO_550_CURRENT_LIMIT);
+    }
 };
-
-void ICSparkMax::SetPIDF(double P, double I, double D, double staticFF) {
-    _pidController.SetP(P);
-    _pidController.SetI(I);
-    _pidController.SetD(D);
-    _pidController.SetFF(staticFF);
-
-    SyncSimPID();
-}
 
 void ICSparkMax::SetTarget(double target, rev::ControlType controlType,
                            int pidSlot, double arbFeedForward,
@@ -33,6 +27,13 @@ void ICSparkMax::SetTarget(double target, rev::ControlType controlType,
     _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward, arbFFUnits);
 
     SyncSimPID();
+}
+
+double ICSparkMax::GetTarget() {
+    if (frc::RobotBase::IsSimulation() && _controlType == rev::ControlType::kSmartMotion) {
+        return _simSmartMotionProfile.Calculate(_timeSinceSmartMotionStart).position.value();
+    }
+    return _target;
 }
 
 void ICSparkMax::Set(double speed) {
@@ -70,23 +71,22 @@ units::volt_t ICSparkMax::GetSimVoltage() {
             break;
 
         case rev::ControlType::kSmartMotion:
-            frc::SmartDashboard::PutNumber("ICSparkMax/SM timer ms", _timeSinceSmartMotionStart.value());
-            frc::SmartDashboard::PutNumber("ICSparkMax/SM profile targ vel", targState.velocity.value()); 
-            frc::SmartDashboard::PutNumber("ICSparkMax/SM profile targ pos", targState.position.value()); 
             output = units::volt_t{
                 _simController.Calculate(
-                    _encoder.GetVelocity(), 
+                    _encoder.GetPosition(), 
                     _simSmartMotionProfile.Calculate(_timeSinceSmartMotionStart)
-                        .velocity
+                        .position
                         .value()
-                )
+                ) + _pidController.GetFF() + _arbFeedForward
             };
             break;
 
         case rev::ControlType::kCurrent:
+            std::cout << "Warning: closed loop Current control not supported by ICSparkMax in Simulation\n";
             break;
 
         case rev::ControlType::kSmartVelocity:
+            std::cout << "Warning: closed loop Smart Velocity control not supported by ICSparkMax in Simulation\n";
             break;
     }
     return std::clamp(output, -12_V, 12_V);
@@ -103,9 +103,9 @@ void ICSparkMax::SetInternalControlType(rev::ControlType controlType) {
     _simControlMode.Set((int)_controlType);
 }
 
-void ICSparkMax::UpdateSimEncoder(double position) {
+void ICSparkMax::UpdateSimEncoder(double position, double velocity) {
     _encoder.SetPosition(position);
-    _simVelocity.Set(position - _prevEncoderPos);
+    _simVelocity.Set(velocity);
     _prevEncoderPos = position;
 }
 
@@ -133,7 +133,7 @@ void ICSparkMax::SyncSimPID() {
 
     } else {
         _smartMotionProfileNotifier.Stop();
-        _timeSinceSmartMotionStart = 0_ms;
     }
+    _timeSinceSmartMotionStart = 0_ms;
 
 }
