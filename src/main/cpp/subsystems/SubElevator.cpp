@@ -12,24 +12,10 @@ SubElevator::SubElevator() {
     _elevator.GetPIDControllerRef().SetSmartMotionMaxVelocity(maxVelocity.value());
     _elevator.GetPIDControllerRef().SetSmartMotionAllowedClosedLoopError(tolerance.value());
 
-    frc::SmartDashboard::PutNumber("Elevator/P", P);
-    frc::SmartDashboard::PutNumber("Elevator/I", I);
-    frc::SmartDashboard::PutNumber("Elevator/D", D);
+    frc::SmartDashboard::PutData("elevator spark", (wpi::Sendable*)&_elevator);
 }
 
-void SubElevator::Periodic() {
-    double newP = frc::SmartDashboard::GetNumber("Elevator/P", 0);
-    double newI = frc::SmartDashboard::GetNumber("Elevator/I", 0);
-    double newD = frc::SmartDashboard::GetNumber("Elevator/D", 0);
-    if (newP != P || newI != I || newD != D) {
-        P = newP;
-        I = newI;
-        D = newD;
-        _elevator.GetPIDControllerRef().SetP(P);
-        _elevator.GetPIDControllerRef().SetI(I);
-        _elevator.GetPIDControllerRef().SetD(D);
-    }
-}
+void SubElevator::Periodic() {}
 
 void SubElevator::DriveTo(units::meter_t height) {
     _elevator.SetTarget(height.value(), rev::ControlType::kSmartMotion);
@@ -49,12 +35,7 @@ void SubElevator::Stop() {
 }
 
 void SubElevator::SimulationPeriodic() {
-    auto simVoltage = _elevator.GetSimVoltage();
-    _sim.SetInputVoltage(simVoltage);
+    _sim.SetInputVoltage(_elevator.GetSimVoltage());
     _sim.Update(20_ms);
     _elevator.UpdateSimEncoder(_sim.GetPosition().value(), _sim.GetVelocity().value());
-    frc::SmartDashboard::PutNumber("Elevator/voltage", simVoltage.value());
-    frc::SmartDashboard::PutNumber("Elevator/target", _elevator.GetTarget());
-    frc::SmartDashboard::PutNumber("Elevator/velocity", _elevator.GetEncoderRef().GetVelocity());
-    frc::SmartDashboard::PutNumber("Elevator/pos", _elevator.GetEncoderRef().GetPosition());
 }

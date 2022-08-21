@@ -1,6 +1,8 @@
 #pragma once
 
 #include <rev/CANSparkMax.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
 #include <units/length.h>
 #include <units/velocity.h>
 #include <units/acceleration.h>
@@ -11,7 +13,7 @@
 #include <frc/simulation/SimDeviceSim.h>
 #include <hal/simulation/SimDeviceData.h>
 
-class ICSparkMax : public rev::CANSparkMax {
+class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
  public:
 
   // Type of motor in use, only used for default current limiting setup
@@ -115,7 +117,15 @@ class ICSparkMax : public rev::CANSparkMax {
   */
   void Set(double speed) override;
 
+  /**
+  * Common interface for setting the voltage of a speed controller.
+  *
+  * @param output The voltage to set.
+  */
   void SetVoltage(units::volt_t output) override;
+
+  // Sendable setup, called when this is passed into smartDashbaord::PutData()
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   // Default smart Current limiting config
@@ -130,6 +140,7 @@ class ICSparkMax : public rev::CANSparkMax {
 
   // PID simulation configuration
   int _pidSlot = 0;
+  bool _updatingTargetFromSendable = false;
   double _target = 0;
   double _arbFeedForward = 0.0;
   frc::PIDController _simController{0,0,0};
@@ -147,5 +158,7 @@ class ICSparkMax : public rev::CANSparkMax {
   hal::SimDouble _simVelocity = _simDeviceSim.GetDouble("Velocity");
   hal::SimDouble _simPosition = _simDeviceSim.GetDouble("Position");
   hal::SimInt _simControlMode = _simDeviceSim.GetInt("Control Mode");
+
+
 
 };

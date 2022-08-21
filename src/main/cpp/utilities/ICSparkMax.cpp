@@ -16,6 +16,50 @@ ICSparkMax::ICSparkMax(int deviceID, Type type)
     }
 };
 
+void ICSparkMax::InitSendable(wpi::SendableBuilder& builder) {
+    builder.AddDoubleProperty(
+        "Position", [&]{return _encoder.GetPosition();},
+        nullptr // cannot set position directly
+    );
+    builder.AddDoubleProperty(
+        "Velocity", [&]{return _encoder.GetVelocity();},
+        nullptr // cannot set velocity directly
+    );
+    builder.AddDoubleProperty(
+        "Voltage", [&]{return GetSimVoltage().value();},
+        nullptr // cannot set voltage directly
+    );
+    builder.AddBooleanProperty(
+        "Update Target", [&]{return _updatingTargetFromSendable;},
+        [&](bool update) {_updatingTargetFromSendable = update;}
+    );
+    builder.AddDoubleProperty(
+        "Target", [&]{return GetTarget();},
+        [&](double target) {
+            if (_updatingTargetFromSendable) {
+              SetTarget(target, _controlType);  
+              _updatingTargetFromSendable = false;
+            }
+        } 
+    );
+    builder.AddDoubleProperty(
+        "P Gain", [&]{return _pidController.GetP();},
+        [&](double P){_pidController.SetP(P);}
+    );
+    builder.AddDoubleProperty(
+        "I Gain", [&]{return _pidController.GetI();},
+        [&](double I){_pidController.SetI(I);}
+    );
+    builder.AddDoubleProperty(
+        "D Gain", [&]{return _pidController.GetD();},
+        [&](double D){_pidController.SetD(D);}
+    );
+    builder.AddDoubleProperty(
+        "F Gain", [&]{return _pidController.GetFF();},
+        [&](double F){_pidController.SetFF(F);}
+    );
+}
+
 void ICSparkMax::SetTarget(double target, rev::ControlType controlType,
                            int pidSlot, double arbFeedForward) {
     _target = target;
