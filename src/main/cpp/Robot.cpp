@@ -4,11 +4,7 @@
 
 #include "Robot.h"
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
-#include <ctre/phoenix/sensors/CANCoder.h>
-#include <frc/simulation/SimDeviceSim.h>
-#include <iostream>
 
 void Robot::DriveWithJoystick(bool fieldRelative) {
   const double deadband = 0.1;
@@ -35,13 +31,7 @@ void Robot::DriveWithJoystick(bool fieldRelative) {
 }
 
 void Robot::RobotInit() {
-  std::cout << "======================\n";
-  frc::sim::SimDeviceSim::EnumerateDevices("", [=](const char* name, HAL_SimDeviceHandle handle){std::cout << name << std::endl;});
-  std::cout << "======================\n";
-
   m_swerve.SyncSensors();
-
-
 }
 
 /**
