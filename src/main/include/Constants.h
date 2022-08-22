@@ -23,8 +23,6 @@ namespace canid {
   constexpr int spmIntake = 99;
   constexpr int spmShooter1 = 99;
   constexpr int spmShooter2 = 99;
-  constexpr int tfxElevator = 5;
-  
 }
 
 namespace pcm {
