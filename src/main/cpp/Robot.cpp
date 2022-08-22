@@ -4,9 +4,7 @@
 
 #include "Robot.h"
 
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
-#include <ctre/phoenix/sensors/CANCoder.h>
 
 void Robot::DriveWithJoystick(bool fieldRelative) {
   const double deadband = 0.1;
@@ -34,7 +32,6 @@ void Robot::DriveWithJoystick(bool fieldRelative) {
 
 void Robot::RobotInit() {
   m_swerve.SyncSensors();
-
 }
 
 /**
