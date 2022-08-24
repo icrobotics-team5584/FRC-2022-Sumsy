@@ -84,7 +84,7 @@ void Robot::TeleopInit() {
  * This function is called periodically during operator control.
  */
 void Robot::TeleopPeriodic() {
-  DriveWithJoystick(true);
+  DriveWithJoystick(false);
 }
 
 /**

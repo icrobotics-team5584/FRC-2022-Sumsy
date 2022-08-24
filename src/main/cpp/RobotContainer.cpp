@@ -4,7 +4,15 @@
 
 #include "RobotContainer.h"
 
-RobotContainer::RobotContainer(){
+#include <frc2/command/button/JoystickButton.h>
+
+RobotContainer::RobotContainer() {
+  using btn = frc2::JoystickButton;
+  using xboxbtn = frc::XboxController::Button;
+
+  btn{&_controller, xboxbtn::kLeftBumper}.WhileHeld(
+      [=] { SubElevator::Getinstance().Extendfirst(); });
+
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings

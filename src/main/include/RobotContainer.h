@@ -6,6 +6,8 @@
 
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
+#include <frc/XboxController.h>
+#include "subsystems/SubElevator.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -21,6 +23,8 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
 
  private:
+frc::XboxController _controller{0};
+
   // The robot's subsystems and commands are defined here...
   void ConfigureButtonBindings();
 };
