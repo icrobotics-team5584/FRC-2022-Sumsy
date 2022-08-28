@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/SubElevator.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 SubElevator::SubElevator() {
     _pidLeftMotorController.SetP(kP);
@@ -11,11 +12,12 @@ SubElevator::SubElevator() {
     _pidLeftMotorController.SetSmartMotionMaxAccel(MAX_ACCERLATION.value());
     _pidLeftMotorController.SetSmartMotionMaxVelocity(MAX_VELOCITY.value());
 
-    _spmLeftElevator.GetEncoder().SetPositionConversionFactor(CONVERSTION_FACTOR);
+    _spmLeftElevator.GetEncoderRef().SetPositionConversionFactor(CONVERSTION_FACTOR);
 
     _spmRightElevator.Follow(_spmLeftElevator);
     _spmRightElevator.SetSmartCurrentLimit(40);
     _spmLeftElevator.SetSmartCurrentLimit(40);
+    frc::SmartDashboard::PutData("Left Elevator Motor",(wpi::Sendable*)&_spmLeftElevator);
 };
 
 
@@ -24,6 +26,24 @@ void SubElevator::Periodic() {}
 
 
 void SubElevator::Extendfirst() {   
-  _pidLeftMotorController.SetReference(FIRST_POSITION.value(), rev::ControlType::kSmartMotion);
+  _spmLeftElevator.SetTarget(FIRST_POSITION.value(), rev::ControlType::kSmartMotion);
+
 }
 
+void SubElevator::SimulationPeriodic() { 
+
+  //calculate voltage going into the elevator
+
+  units::volt_t applyVoltage =_spmLeftElevator.GetSimVoltage(); //calculates the voltage
+
+  //Update physics simulation with the volatge we gave it
+
+  _elevatorSim.SetInputVoltage(applyVoltage); //applies the voltage to simulator
+  _elevatorSim.Update(20_ms); //updates physics simulation every 20ms
+
+  //Updates our encoder position to simulator position
+
+  auto verticleVelocity = _elevatorSim.GetVelocity(); //elevator sim gets the velocity 
+  units::meter_t verticleDistence = _elevatorSim.GetPosition();//elevator sim gets the verticle distence
+  _spmLeftElevator.UpdateSimEncoder(verticleDistence.value(),verticleVelocity.value());//position of the encoder is the verticle distence
+}

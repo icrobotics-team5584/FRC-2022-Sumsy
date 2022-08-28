@@ -10,6 +10,9 @@
 #include <units/acceleration.h>
 #include <units/length.h>
 #include <units/velocity.h>
+#include <utilities/ICSparkMax.h>
+#include <frc/simulation/ElevatorSim.h>
+#include <units/mass.h>
 
 class SubElevator : public frc2::SubsystemBase {
  public:
@@ -24,12 +27,14 @@ class SubElevator : public frc2::SubsystemBase {
    * Will be called periodically whenever the CommandScheduler runs.
    */
   void Periodic() override;
+  void SimulationPeriodic() override;
 
   void Extendfirst();   // extends the elevators to the first position
   void Extendsecond();  // extends the evevators to the second position
   void Extendthird();   // extends the elevators to the third position
   void Retract();       // retracts the elevators one position
   void Reset();         // resets the evevators to the lowest position
+
 
  private:
  
@@ -39,20 +44,22 @@ class SubElevator : public frc2::SubsystemBase {
   static constexpr units::meter_t THIRD_POSITION = 1_m;
   const units::meters_per_second_t MAX_VELOCITY = 1_mps;
   const units::meters_per_second_squared_t MAX_ACCERLATION = 1_mps_sq;
+  const units::kilogram_t CARRAGE_WEIGHT = 0.1_kg; 
 
-  static constexpr double kP = 5e-5, kI = 1e-6, kD = 0;
+  static constexpr double kP = 30.0, kI = 0, kD = 0;
   const double GEARBOX_REDUCTION = 20;
-  const units::meter_t PULLY_DIAMETER = 0.002_m;
-  const double CONVERSTION_FACTOR = GEARBOX_REDUCTION * PULLY_DIAMETER.value();
+  const units::meter_t DRUM_RADIUS = 0.05_m;
+  const double CONVERSTION_FACTOR = GEARBOX_REDUCTION * DRUM_RADIUS.value();
 
-  rev::CANSparkMax _spmLeftElevator{canid::spmElevatorLeft,
-                                    rev::CANSparkMax::MotorType::kBrushless};
+   ICSparkMax _spmLeftElevator{canid::spmElevatorLeft,ICSparkMax::Type::NEO};
 
-  rev::CANSparkMax _spmRightElevator{canid::spmElevatorRight,
-                                     rev::CANSparkMax::MotorType::kBrushless};
+  ICSparkMax _spmRightElevator{canid::spmElevatorRight,ICSparkMax::Type::NEO};
 
   rev::SparkMaxPIDController _pidLeftMotorController =
-      _spmLeftElevator.GetPIDController();
+      _spmLeftElevator.GetPIDControllerRef();
+
+//simulation code:
+frc::sim::ElevatorSim _elevatorSim{frc::DCMotor::NEO(2),GEARBOX_REDUCTION,CARRAGE_WEIGHT,DRUM_RADIUS,MIN_POSITION,THIRD_POSITION};
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
