@@ -23,10 +23,16 @@ class SubPickup : public frc2::SubsystemBase {
 
   void Retractor();
 
+  void Intake();
+
+  void Outake();
+
+  void Stoptake();
+
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
-  frc::DoubleSolenoid _piston {frc::PneumaticsModuleType::CTREPCM, 0, 1};
-
+  frc::DoubleSolenoid _piston {1, frc::PneumaticsModuleType::CTREPCM, 0, 1};
+  WPI_TalonFX _intakeMotor {14};
 };

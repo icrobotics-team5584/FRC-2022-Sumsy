@@ -12,6 +12,7 @@ CmdDeployPickup::CmdDeployPickup() {
 // Called when the command is initially scheduled.
 void CmdDeployPickup::Initialize() {
   SubPickup::GetInstance().Extender();
+  SubPickup::GetInstance().Intake();
 }
 
 // Called repeatedly when this Command is scheduled to run
@@ -20,6 +21,7 @@ void CmdDeployPickup::Execute() {}
 // Called once the command ends or is interrupted.
 void CmdDeployPickup::End(bool interrupted) {
   SubPickup::GetInstance().Retractor();
+  SubPickup::GetInstance().Stoptake();
 }
 
 // Returns true when the command should end.
