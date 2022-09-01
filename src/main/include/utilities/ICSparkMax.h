@@ -47,7 +47,7 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
    * units for the parameter is Volts. This value is set after the control
    * mode, but before any current limits or ramp rates
    */
-  void SetTarget(double target, rev::ControlType controlType, int pidSlot = 0,
+  void SetTarget(double target, rev::CANSparkMax::ControlType controlType, int pidSlot = 0,
                  double arbFeedForward = 0.0);
 
   /**
@@ -102,7 +102,7 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
   /**
    * Gets the current closed loop control type.
    */
-  rev::ControlType GetControlType() { return _controlType; };
+  rev::CANSparkMax::ControlType GetControlType() { return _controlType; };
   
   /**
    * Common interface to stop the motor until Set is called again or 
@@ -150,8 +150,8 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
   };
   units::millisecond_t _timeSinceSmartMotionStart = 0_ms;
   frc::Notifier _smartMotionProfileNotifier{[&]{_timeSinceSmartMotionStart+=20_ms;}};
-  rev::ControlType _controlType = rev::ControlType::kDutyCycle;
-  void SetInternalControlType(rev::ControlType controlType);
+  rev::CANSparkMax::ControlType _controlType = rev::CANSparkMax::ControlType::kDutyCycle;
+  void SetInternalControlType(rev::CANSparkMax::ControlType controlType);
 
   // Sim device values (stuff that shows under Other Devices on Glass)
   frc::sim::SimDeviceSim _simDeviceSim {"SPARK MAX ", GetDeviceId()};
