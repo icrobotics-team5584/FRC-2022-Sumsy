@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+#include "subsystems/CmdDeployPickup.h"
 
 #include <frc2/command/button/JoystickButton.h>
 
@@ -20,8 +21,11 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ConfigureButtonBindings() {
+  using  Btn = frc::XboxController::Button;
   
+  frc2::JoystickButton{&_joystick0,, frc::XboxController::Button::kA}
   // Configure your button bindings here
+  _rightBumber.WhileHeld(CmdDeployPickup{});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
