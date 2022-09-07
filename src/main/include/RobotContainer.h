@@ -24,8 +24,6 @@ class RobotContainer {
   frc2::Command* GetAutonomousCommand();
 
  private:
-frc::XboxController _controller{0};
-
   // The robot's subsystems and commands are defined here...
   void ConfigureButtonBindings();
   frc::XboxController _controller {1};

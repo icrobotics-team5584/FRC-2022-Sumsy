@@ -18,7 +18,7 @@ SubElevator::SubElevator() {
     _spmRightElevator.SetSmartCurrentLimit(40);
     _spmLeftElevator.SetSmartCurrentLimit(40);
     frc::SmartDashboard::PutData("Left Elevator Motor",(wpi::Sendable*)&_spmLeftElevator);
-};
+}
 
 
 // This method will be called once per scheduler run
@@ -26,7 +26,7 @@ void SubElevator::Periodic() {}
 
 
 void SubElevator::Extendfirst() {   
-  _spmLeftElevator.SetTarget(FIRST_POSITION.value(), rev::ControlType::kSmartMotion);
+  _spmLeftElevator.SetTarget(FIRST_POSITION.value(), rev::CANSparkMax::ControlType::kSmartMotion);
 
 }
 
