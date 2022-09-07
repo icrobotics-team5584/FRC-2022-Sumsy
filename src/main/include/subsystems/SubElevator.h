@@ -36,12 +36,14 @@ class SubElevator : public frc2::SubsystemBase {
   void Reset();         // resets the evevators to the lowest position
 
 
- private:
- 
   static constexpr units::meter_t MIN_POSITION = 0_m;
   static constexpr units::meter_t FIRST_POSITION = 0.5_m;
   static constexpr units::meter_t SECOND_POSITION = 0.75_m;
   static constexpr units::meter_t THIRD_POSITION = 1_m;
+
+ private:
+ 
+  
   const units::meters_per_second_t MAX_VELOCITY = 1_mps;
   const units::meters_per_second_squared_t MAX_ACCERLATION = 1_mps_sq;
   const units::kilogram_t CARRAGE_WEIGHT = 0.1_kg; 
