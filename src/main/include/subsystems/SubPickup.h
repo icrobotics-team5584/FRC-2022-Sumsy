@@ -7,6 +7,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <frc/DoubleSolenoid.h>
 #include <ctre/Phoenix.h>
+#include "Constants.h"
 
 class SubPickup : public frc2::SubsystemBase {
  public:

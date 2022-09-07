@@ -23,7 +23,7 @@ namespace can {
   constexpr int spmIntake = 99;
   constexpr int spmShooter1 = 99;
   constexpr int spmShooter2 = 99;
-  
+  constexpr int tfxIntake = 14;
 }
 
 namespace pcm {
