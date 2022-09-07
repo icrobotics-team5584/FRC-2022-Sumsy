@@ -22,7 +22,13 @@ SubElevator::SubElevator() {
 
 
 // This method will be called once per scheduler run
-void SubElevator::Periodic() {}
+void SubElevator::Periodic() {
+frc::SmartDashboard::PutNumber("Elevator Target Value", _spmLeftElevator.GetTarget());
+frc::SmartDashboard::PutNumber("Elevator Current Position", _spmLeftElevator.GetEncoderRef().GetPosition());
+
+
+
+}
 
 
 void SubElevator::Extendfirst() {   

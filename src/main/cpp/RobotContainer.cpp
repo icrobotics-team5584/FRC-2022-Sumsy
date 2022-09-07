@@ -6,24 +6,21 @@
 #include "subsystems/CmdDeployPickup.h"
 
 #include <frc2/command/button/JoystickButton.h>
+#include "commands/CmdElevatorSequence.h"
+#include "subsystems/SubElevator.h"
 
 RobotContainer::RobotContainer() {
-  using btn = frc2::JoystickButton;
-  using xboxbtn = frc::XboxController::Button;
-
-  btn{&_controller, xboxbtn::kLeftBumper}.WhileHeld(
-      [=] { SubElevator::Getinstance().Extendfirst(); });
-
   // Initialize all of your commands and subsystems here
-
+ SubElevator::Getinstance();
   // Configure the button bindings
   ConfigureButtonBindings();
 }
 
 void RobotContainer::ConfigureButtonBindings() {
-  using  Btn = frc::XboxController::Button;
+  using  BtnId = frc::XboxController::Button;
+  using Btn = frc2::JoystickButton; 
   
-  frc2::JoystickButton{&_controller, frc::XboxController::Button::kA};
+  Btn{&_controller, BtnId::kA}.WhenPressed(CmdElevatorSequence{});
   // Configure your button bindings here
   _rightBumber.WhileHeld(CmdDeployPickup{});
 }
