@@ -32,3 +32,7 @@ namespace pcm {
   constexpr int solIntakeIn = 1;
 }
 
+namespace dio {
+  constexpr int lineBreakPayload = 0;
+}
+

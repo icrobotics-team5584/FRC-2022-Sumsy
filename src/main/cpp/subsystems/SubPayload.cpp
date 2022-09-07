@@ -3,12 +3,25 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/SubPayload.h"
+#include "Constants.h"
 
 SubPayload::SubPayload() = default;
 
 // This method will be called once per scheduler run
 void SubPayload::Periodic() {}
 
-void SubPayload::Intake() {}
+void SubPayload::Intake() {
+    _spmPayload.Set(0.3);
+}
 
-void SubPayload::Outake() {}
+void SubPayload::Outake() {
+    _spmPayload.Set(-0.3);
+}
+
+void SubPayload::Stop() {
+    _spmPayload.Set(0.0);
+}
+
+bool SubPayload::HasBall() {
+    return _LineBreakPayload.Get();
+}
