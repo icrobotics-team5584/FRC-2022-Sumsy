@@ -27,5 +27,7 @@ namespace canid {
 }
 
 namespace pcm {
+  constexpr int solIntakeOut = 0;
+  constexpr int solIntakeIn = 1;
 }
 
