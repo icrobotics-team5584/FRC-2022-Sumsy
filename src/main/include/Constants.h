@@ -24,6 +24,7 @@ namespace canid {
   constexpr int spmShooter1 = 99;
   constexpr int spmShooter2 = 99;
   constexpr int tfxIntake = 14;
+  constexpr int spmPayload = 99;
 }
 
 namespace pcm {
