@@ -44,11 +44,11 @@ class SubElevator : public frc2::SubsystemBase {
  private:
  
   
-  const units::meters_per_second_t MAX_VELOCITY = 1_mps;
+  const units::meters_per_second_t MAX_VELOCITY = 0.003_mps;
   const units::meters_per_second_squared_t MAX_ACCERLATION = 1_mps_sq;
   const units::kilogram_t CARRAGE_WEIGHT = 0.1_kg; 
 
-  static constexpr double kP = 30.0, kI = 0, kD = 0;
+  static constexpr double kP = 0.05, kI = 0, kD = 0;
   const double GEARBOX_REDUCTION = 20;
   const units::meter_t DRUM_RADIUS = 0.05_m;
   const double CONVERSTION_FACTOR = GEARBOX_REDUCTION * DRUM_RADIUS.value();
