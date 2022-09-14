@@ -2,13 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/smartdashboard/SmartDashboard.h>
 #include "subsystems/SubPayload.h"
 #include "Constants.h"
+
 
 SubPayload::SubPayload() = default;
 
 // This method will be called once per scheduler run
-void SubPayload::Periodic() {}
+void SubPayload::Periodic() {
+    frc::SmartDashboard::PutNumber("Payload motor speed", _spmPayload.Get());
+    frc::SmartDashboard::PutBoolean("Payload linebreak", HasBall());
+}
 
 void SubPayload::Intake() {
     _spmPayload.Set(0.3);

@@ -27,4 +27,5 @@ class RobotContainer {
   void ConfigureButtonBindings();
   frc::XboxController _controller {1};
   frc2::JoystickButton _rightBumber {&_controller, frc::XboxController::Button::kRightBumper};
+  frc2::JoystickButton _leftBumber {&_controller, frc::XboxController::Button::kLeftBumper};
 };

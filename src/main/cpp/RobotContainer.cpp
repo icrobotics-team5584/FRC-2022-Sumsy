@@ -4,6 +4,7 @@
 
 #include "RobotContainer.h"
 #include "commands/CmdDeployPickup.h"
+#include "commands/CmdPayloadOutake.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -15,6 +16,7 @@ RobotContainer::RobotContainer(){
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
   _rightBumber.WhileHeld(CmdDeployPickup{});
+  _leftBumber.WhileHeld(CmdPayloadOutake{});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
