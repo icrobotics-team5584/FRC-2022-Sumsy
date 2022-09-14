@@ -13,6 +13,8 @@ class SubPayload : public frc2::SubsystemBase {
  public:
   SubPayload();
 
+  static SubPayload &GetInstance() {static SubPayload inst; return inst;}
+
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */

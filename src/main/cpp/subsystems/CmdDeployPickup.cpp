@@ -4,6 +4,7 @@
 
 #include "subsystems/CmdDeployPickup.h"
 #include "subsystems/SubPickup.h"
+#include "subsystems/SubPayload.h"
 
 CmdDeployPickup::CmdDeployPickup() {
   // Use addRequirements() here to declare subsystem dependencies.
@@ -13,6 +14,7 @@ CmdDeployPickup::CmdDeployPickup() {
 void CmdDeployPickup::Initialize() {
   SubPickup::GetInstance().Extender();
   SubPickup::GetInstance().Intake();
+  SubPayload::GetInstance().Intake();
 }
 
 // Called repeatedly when this Command is scheduled to run
@@ -22,9 +24,16 @@ void CmdDeployPickup::Execute() {}
 void CmdDeployPickup::End(bool interrupted) {
   SubPickup::GetInstance().Retractor();
   SubPickup::GetInstance().Stoptake();
+  SubPayload::GetInstance().Stop();
 }
 
 // Returns true when the command should end.
 bool CmdDeployPickup::IsFinished() {
-  return false;
+  if (SubPayload::GetInstance().HasBall()){
+    return true;
+  }
+  else {
+    return false;
+  }
+  
 }
