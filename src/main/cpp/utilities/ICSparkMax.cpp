@@ -1,184 +1,240 @@
 #include "utilities/ICSparkMax.h"
 
 #include <frc/RobotBase.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <units/voltage.h>
+
+#include <cstdlib>
 #include <iostream>
 
 ICSparkMax::ICSparkMax(int deviceID, Type type)
     : rev::CANSparkMax(deviceID,
                        rev::CANSparkMaxLowLevel::MotorType::kBrushless) {
-    _type = type;
-    RestoreFactoryDefaults();
-    if (type == Type::NEO) {
-        SetSmartCurrentLimit(NEO_CURRENT_LIMIT);
-    } else {
-        SetSmartCurrentLimit(NEO_550_CURRENT_LIMIT);
-    }
+  _type = type;
+  RestoreFactoryDefaults();
+  if (type == Type::NEO) {
+    SetSmartCurrentLimit(NEO_CURRENT_LIMIT);
+  } else {
+    SetSmartCurrentLimit(NEO_550_CURRENT_LIMIT);
+  }
+
+  _pidController.SetSmartMotionMinOutputVelocity(0);
 }
 
 void ICSparkMax::InitSendable(wpi::SendableBuilder& builder) {
-    builder.AddDoubleProperty(
-        "Position", [&]{return _encoder.GetPosition();},
-        nullptr // cannot set position directly
-    );
-    builder.AddDoubleProperty(
-        "Velocity", [&]{return _encoder.GetVelocity();},
-        nullptr // cannot set velocity directly
-    );
-    builder.AddDoubleProperty(
-        "Voltage", [&]{return GetSimVoltage().value();},
-        nullptr // cannot set voltage directly
-    );
-    builder.AddBooleanProperty(
-        "Update Target", [&]{return _updatingTargetFromSendable;},
-        [&](bool update) {_updatingTargetFromSendable = update;}
-    );
-    builder.AddDoubleProperty(
-        "Target", [&]{return GetTarget();},
-        [&](double target) {
-            if (_updatingTargetFromSendable) {
-              SetTarget(target, _controlType);  
-              _updatingTargetFromSendable = false;
-            }
-        } 
-    );
-    builder.AddDoubleProperty(
-        "P Gain", [&]{return _pidController.GetP();},
-        [&](double P){_pidController.SetP(P);}
-    );
-    builder.AddDoubleProperty(
-        "I Gain", [&]{return _pidController.GetI();},
-        [&](double I){_pidController.SetI(I);}
-    );
-    builder.AddDoubleProperty(
-        "D Gain", [&]{return _pidController.GetD();},
-        [&](double D){_pidController.SetD(D);}
-    );
-    builder.AddDoubleProperty(
-        "F Gain", [&]{return _pidController.GetFF();},
-        [&](double F){_pidController.SetFF(F);}
-    );
+  builder.AddDoubleProperty(
+      "Position", [&] { return _encoder.GetPosition(); },
+      nullptr  // cannot set position directly
+  );
+  builder.AddDoubleProperty(
+      "Velocity", [&] { return _encoder.GetVelocity(); },
+      nullptr  // cannot set velocity directly
+  );
+  builder.AddDoubleProperty(
+      "Voltage", [&] { return GetSimVoltage().value(); },
+      nullptr  // cannot set voltage directly
+  );
+  builder.AddBooleanProperty(
+      "Update Target", [&] { return _updatingTargetFromSendable; },
+      [&](bool update) { _updatingTargetFromSendable = update; });
+  builder.AddDoubleProperty(
+      "Target", [&] { return GetTarget(); },
+      [&](double target) {
+        if (_updatingTargetFromSendable) {
+          SetTarget(target, _controlType);
+          _updatingTargetFromSendable = false;
+        }
+      });
+  builder.AddDoubleProperty(
+      "Smart Motion Velocity Target",
+      [&] {
+        if (frc::RobotBase::IsSimulation()) {
+          return _simSmartMotionProfile
+              .Calculate(_smartMotionProfileTimer.Get())
+              .velocity.value();
+        } else {
+          return 0.0;
+        }
+      },
+      nullptr  // cannot set Smart Motion target velocity directly
+  );
+  builder.AddDoubleProperty(
+      "P Gain", [&] { return _pidController.GetP(); },
+      [&](double P) { _pidController.SetP(P); });
+  builder.AddDoubleProperty(
+      "I Gain", [&] { return _pidController.GetI(); },
+      [&](double I) { _pidController.SetI(I); });
+  builder.AddDoubleProperty(
+      "D Gain", [&] { return _pidController.GetD(); },
+      [&](double D) { _pidController.SetD(D); });
+  builder.AddDoubleProperty(
+      "F Gain", [&] { return _pidController.GetFF(); },
+      [&](double F) { _pidController.SetFF(F); });
 }
 
-void ICSparkMax::SetTarget(double target, rev::CANSparkMax::ControlType controlType,
-                           int pidSlot, double arbFeedForward) {
-    _target = target;
-    _pidSlot = pidSlot;
-    _arbFeedForward = arbFeedForward;
-    SetInternalControlType(controlType);
-    _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward);
+void ICSparkMax::SetTarget(double target, Mode controlType, int pidSlot,
+                           double arbFeedForward) {
+  _target = target;
+  _pidSlot = pidSlot;
+  _arbFeedForward = arbFeedForward;
+  SetInternalControlType(controlType);
 
-    SyncSimPID();
-}
+  _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward);
 
-double ICSparkMax::GetTarget() {
-    if (frc::RobotBase::IsSimulation() && _controlType == rev::CANSparkMax::ControlType::kSmartMotion) {
-        return _simSmartMotionProfile.Calculate(_timeSinceSmartMotionStart).position.value();
-    }
-    return _target;
+  SyncSimPID();
 }
 
 void ICSparkMax::Set(double speed) {
-    if (frc::RobotBase::IsSimulation()) {
-        SetTarget(speed, rev::CANSparkMax::ControlType::kDutyCycle);
-    } 
-    CANSparkMax::Set(speed);
+  if (frc::RobotBase::IsSimulation()) {
+    SetTarget(speed, Mode::kDutyCycle);
+  }
+  CANSparkMax::Set(speed);
 }
 
 void ICSparkMax::SetVoltage(units::volt_t output) {
-    SetTarget(output.value(), rev::CANSparkMax::ControlType::kVoltage);
+  SetTarget(output.value(), Mode::kVoltage);
+}
+
+void ICSparkMax::SetSmartMotionMaxAccel(double maxAcceleration) {
+  _pidController.SetSmartMotionMaxAccel(maxAcceleration /
+                                        _RPMpsToDesiredAccelUnits);
+}
+
+void ICSparkMax::SetSmartMotionMaxVelocity(double maxVelocity) {
+  _pidController.SetSmartMotionMaxVelocity(
+      maxVelocity / _encoder.GetVelocityConversionFactor());
+  frc::SmartDashboard::PutNumber("max vel in RPM",
+                                 _pidController.GetSmartMotionMaxVelocity());
+}
+
+void ICSparkMax::SetConversionFactors(double rotationsToDesired,
+                                      double RPMToDesired,
+                                      double RPMpsToDesired) {
+  _encoder.SetPositionConversionFactor(rotationsToDesired);
+  _encoder.SetVelocityConversionFactor(RPMToDesired);
+  _RPMpsToDesiredAccelUnits = RPMpsToDesired;
+}
+
+void ICSparkMax::SetPIDFF(double P, double I, double D, double FF) {
+  _pidController.SetP(P);
+  _pidController.SetI(I);
+  _pidController.SetD(D);
+  _pidController.SetFF(FF);
+  SyncSimPID();
+}
+
+void ICSparkMax::SetEncoderPosition(double position) {
+  _encoder.SetPosition(position);
+}
+
+void ICSparkMax::SetClosedLoopOutputRange(double minOutputPercent,
+                                          double maxOutputPercent) {
+  _pidController.SetOutputRange(minOutputPercent, maxOutputPercent);
 }
 
 units::volt_t ICSparkMax::GetSimVoltage() {
-    units::volt_t output = 0_V;
+  units::volt_t output = 0_V;
+  // Regenerate SM profile every 0.2 seconds. Rev does this to avoid building
+  // up error in position. We don't know how often they do it but this is a
+  // guess.
+  if (_smartMotionProfileTimer.Get() > 0.2_s) {
+    GenerateSMProfile();
+  }
+  auto targState = _simSmartMotionProfile.Calculate(_smartMotionProfileTimer.Get());
 
-    switch (_controlType) {
-        case rev::CANSparkMax::ControlType::kDutyCycle:
-            output = units::volt_t{_target * 12};
-            break;
+  switch (_controlType) {
+    case Mode::kDutyCycle:
+      output = units::volt_t{_target * 12};
+      break;
 
-        case rev::CANSparkMax::ControlType::kVelocity:
-            output = units::volt_t { 
-                _simController.Calculate(_encoder.GetVelocity(),_target) 
-                + _pidController.GetFF() + _arbFeedForward
-            };
-            break;
+    case Mode::kVelocity:
+      output = units::volt_t{
+          _simController.Calculate(_encoder.GetVelocity(), _target) +
+          _pidController.GetFF() * _target + _arbFeedForward};
+      break;
 
-        case rev::CANSparkMax::ControlType::kPosition:
-            output = units::volt_t { 
-                _simController.Calculate(_encoder.GetPosition(),_target) 
-                + _pidController.GetFF() + _arbFeedForward
-            };
-            break;
+    case Mode::kPosition:
+      output = units::volt_t{
+          _simController.Calculate(_encoder.GetPosition(), _target) +
+          _pidController.GetFF() * _target + _arbFeedForward};
+      break;
 
-        case rev::CANSparkMax::ControlType::kVoltage:
-            output = units::volt_t{_target};
-            break;
+    case Mode::kVoltage:
+      output = units::volt_t{_target};
+      break;
 
-        case rev::CANSparkMax::ControlType::kSmartMotion:
-            output = units::volt_t{
-                _simController.Calculate(
-                    _encoder.GetPosition(), 
-                    _simSmartMotionProfile.Calculate(_timeSinceSmartMotionStart)
-                        .position
-                        .value()
-                ) + _pidController.GetFF() + _arbFeedForward
-            };
-            break;
+    case Mode::kSmartMotion:
+      if (std::abs(_target - _encoder.GetPosition()) <
+          _pidController.GetSmartMotionAllowedClosedLoopError()) {
+        break;
+      }
+      output = (_simController.Calculate(_encoder.GetVelocity(),
+                                         targState.velocity.value()) +
+                _pidController.GetFF() * targState.velocity.value() +
+                _arbFeedForward) *
+               1_V;
+      break;
 
-        case rev::CANSparkMax::ControlType::kCurrent:
-            std::cout << "Warning: closed loop Current control not supported by ICSparkMax in Simulation\n";
-            break;
+    case Mode::kCurrent:
+      std::cout << "Warning: closed loop Current control not supported by "
+                   "ICSparkMax in Simulation\n";
+      break;
 
-        case rev::CANSparkMax::ControlType::kSmartVelocity:
-            std::cout << "Warning: closed loop Smart Velocity control not supported by ICSparkMax in Simulation\n";
-            break;
-    }
-    return std::clamp(output, -12_V, 12_V);
+    case Mode::kSmartVelocity:
+      std::cout << "Warning: closed loop Smart Velocity control not "
+                   "supported by "
+                   "ICSparkMax in Simulation\n";
+      break;
+  }
+  return std::clamp(output, -12_V, 12_V);
 }
 
 void ICSparkMax::StopMotor() {
-    _target = 0;
-    SetInternalControlType(rev::CANSparkMax::ControlType::kDutyCycle);
-    CANSparkMax::StopMotor();
+  _target = 0;
+  SetInternalControlType(Mode::kDutyCycle);
+  CANSparkMax::StopMotor();
 }
 
-void ICSparkMax::SetInternalControlType(rev::CANSparkMax::ControlType controlType) {
-    _controlType = controlType;
-    _simControlMode.Set((int)_controlType);
+void ICSparkMax::SetInternalControlType(Mode controlType) {
+  _controlType = controlType;
+  _simControlMode.Set((int)_controlType);
 }
 
 void ICSparkMax::UpdateSimEncoder(double position, double velocity) {
-    _encoder.SetPosition(position);
-    _simVelocity.Set(velocity);
-    _prevEncoderPos = position;
+  _encoder.SetPosition(position);
+  _simVelocity.Set(velocity);
+  _prevEncoderPos = position;
 }
 
 void ICSparkMax::SyncSimPID() {
-    if (frc::RobotBase::IsReal()) return;
+  if (frc::RobotBase::IsReal()) return;
 
-    _simController.SetP(_pidController.GetP());
-    _simController.SetI(_pidController.GetI());
-    _simController.SetD(_pidController.GetD());
-    _simController.SetIntegratorRange(-_pidController.GetIMaxAccum(), _pidController.GetIMaxAccum());
+  _simController.SetP(_pidController.GetP());
+  _simController.SetI(_pidController.GetI());
+  _simController.SetD(_pidController.GetD());
+  _simController.SetIntegratorRange(-_pidController.GetIMaxAccum(),
+                                    _pidController.GetIMaxAccum());
 
-    if (_controlType == rev::CANSparkMax::ControlType::kSmartMotion) {
-        frc::TrapezoidProfile<units::meters>::Constraints constrainsts = {
-            units::meters_per_second_t{_pidController.GetSmartMotionMaxVelocity()},
-            units::meters_per_second_squared_t{_pidController.GetSmartMotionMaxAccel()}
-        };
+  if (_controlType == Mode::kSmartMotion) {
+    GenerateSMProfile();
+  } else {
+    _smartMotionProfileTimer.Stop();
+  }
+}
 
-        _simSmartMotionProfile = {
-            constrainsts,
-            {units::meter_t{_target}, 0_mps},
-            {units::meter_t{_encoder.GetPosition()}, units::meters_per_second_t{_encoder.GetVelocity()}} 
-        };
+void ICSparkMax::GenerateSMProfile() {
+  _smartMotionProfileTimer.Reset();
+  _smartMotionProfileTimer.Start();
 
-        _smartMotionProfileNotifier.StartPeriodic(20_ms);
+  frc::TrapezoidProfile<units::meters>::Constraints constrainsts = {
+      units::meters_per_second_t{_pidController.GetSmartMotionMaxVelocity() *
+                                 _encoder.GetVelocityConversionFactor()},
+      units::meters_per_second_squared_t{
+          _pidController.GetSmartMotionMaxAccel() * _RPMpsToDesiredAccelUnits}};
 
-    } else {
-        _smartMotionProfileNotifier.Stop();
-    }
-    _timeSinceSmartMotionStart = 0_ms;
-
+  _simSmartMotionProfile = {
+      constrainsts,
+      {units::meter_t{_target}, 0_mps},
+      {units::meter_t{_encoder.GetPosition()},
+       units::meters_per_second_t{_encoder.GetVelocity()}}};
 }
