@@ -21,3 +21,15 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
   return nullptr;
 }
+
+double RobotContainer::ControllerGetLeftX() {
+  return _controller.GetLeftX();
+}
+
+double RobotContainer::ControllerGetLeftY() {
+  return _controller.GetLeftY();
+}
+
+double RobotContainer::ControllerGetRightX() {
+  return _controller.GetRightX();
+}
