@@ -6,13 +6,15 @@
 #include "subsystems/SubPayload.h"
 #include "Constants.h"
 
-
-SubPayload::SubPayload() = default;
+SubPayload::SubPayload(){
+    _spmPayloadFollow.Follow(_spmPayload, false);
+}
 
 // This method will be called once per scheduler run
 void SubPayload::Periodic() {
     frc::SmartDashboard::PutNumber("Payload motor speed", _spmPayload.Get());
-    frc::SmartDashboard::PutBoolean("Payload linebreak", HasBall());
+    frc::SmartDashboard::PutNumber("PayloadFollow motor speed", _spmPayloadFollow.Get());
+    frc::SmartDashboard::PutBoolean("Payload linebreak", HasBall());  
 }
 
 void SubPayload::Intake() {
