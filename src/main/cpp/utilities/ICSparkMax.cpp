@@ -24,16 +24,11 @@ ICSparkMax::ICSparkMax(int deviceID, Type type)
 void ICSparkMax::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "Position", [&] { return _encoder.GetPosition(); },
-      nullptr  // cannot set position directly
-  );
+      nullptr);  // setter is null, cannot set position directly
   builder.AddDoubleProperty(
-      "Velocity", [&] { return _encoder.GetVelocity(); },
-      nullptr  // cannot set velocity directly
-  );
+      "Velocity", [&] { return _encoder.GetVelocity(); }, nullptr);
   builder.AddDoubleProperty(
-      "Voltage", [&] { return GetSimVoltage().value(); },
-      nullptr  // cannot set voltage directly
-  );
+      "Voltage", [&] { return GetSimVoltage().value(); }, nullptr);
   builder.AddBooleanProperty(
       "Update Target", [&] { return _updatingTargetFromSendable; },
       [&](bool update) { _updatingTargetFromSendable = update; });
@@ -46,18 +41,8 @@ void ICSparkMax::InitSendable(wpi::SendableBuilder& builder) {
         }
       });
   builder.AddDoubleProperty(
-      "Smart Motion Velocity Target",
-      [&] {
-        if (frc::RobotBase::IsSimulation()) {
-          return _simSmartMotionProfile
-              .Calculate(_smartMotionProfileTimer.Get())
-              .velocity.value();
-        } else {
-          return 0.0;
-        }
-      },
-      nullptr  // cannot set Smart Motion target velocity directly
-  );
+      "Smart Motion Velocity Target", [&] { return GetCurrentSMVelocity(); },
+      nullptr);
   builder.AddDoubleProperty(
       "P Gain", [&] { return _pidController.GetP(); },
       [&](double P) { _pidController.SetP(P); });
@@ -80,7 +65,6 @@ void ICSparkMax::SetTarget(double target, Mode controlType, int pidSlot,
   SetInternalControlType(controlType);
 
   _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward);
-
   SyncSimPID();
 }
 
@@ -103,8 +87,6 @@ void ICSparkMax::SetSmartMotionMaxAccel(double maxAcceleration) {
 void ICSparkMax::SetSmartMotionMaxVelocity(double maxVelocity) {
   _pidController.SetSmartMotionMaxVelocity(
       maxVelocity / _encoder.GetVelocityConversionFactor());
-  frc::SmartDashboard::PutNumber("max vel in RPM",
-                                 _pidController.GetSmartMotionMaxVelocity());
 }
 
 void ICSparkMax::SetConversionFactors(double rotationsToDesired,
@@ -134,13 +116,6 @@ void ICSparkMax::SetClosedLoopOutputRange(double minOutputPercent,
 
 units::volt_t ICSparkMax::GetSimVoltage() {
   units::volt_t output = 0_V;
-  // Regenerate SM profile every 0.2 seconds. Rev does this to avoid building
-  // up error in position. We don't know how often they do it but this is a
-  // guess.
-  if (_smartMotionProfileTimer.Get() > 0.2_s) {
-    GenerateSMProfile();
-  }
-  auto targState = _simSmartMotionProfile.Calculate(_smartMotionProfileTimer.Get());
 
   switch (_controlType) {
     case Mode::kDutyCycle:
@@ -164,15 +139,10 @@ units::volt_t ICSparkMax::GetSimVoltage() {
       break;
 
     case Mode::kSmartMotion:
-      if (std::abs(_target - _encoder.GetPosition()) <
-          _pidController.GetSmartMotionAllowedClosedLoopError()) {
-        break;
-      }
-      output = (_simController.Calculate(_encoder.GetVelocity(),
-                                         targState.velocity.value()) +
-                _pidController.GetFF() * targState.velocity.value() +
-                _arbFeedForward) *
-               1_V;
+      output = units::volt_t{(_simController.Calculate(_encoder.GetVelocity(),
+                                                       GetCurrentSMVelocity()) +
+                              _pidController.GetFF() * GetCurrentSMVelocity() +
+                              _arbFeedForward)};
       break;
 
     case Mode::kCurrent:
@@ -181,9 +151,8 @@ units::volt_t ICSparkMax::GetSimVoltage() {
       break;
 
     case Mode::kSmartVelocity:
-      std::cout << "Warning: closed loop Smart Velocity control not "
-                   "supported by "
-                   "ICSparkMax in Simulation\n";
+      std::cout << "Warning: closed loop Smart Velocity control not supported "
+                   "by ICSparkMax in Simulation\n";
       break;
   }
   return std::clamp(output, -12_V, 12_V);
@@ -237,4 +206,19 @@ void ICSparkMax::GenerateSMProfile() {
       {units::meter_t{_target}, 0_mps},
       {units::meter_t{_encoder.GetPosition()},
        units::meters_per_second_t{_encoder.GetVelocity()}}};
+}
+
+double ICSparkMax::GetCurrentSMVelocity() {
+  if (frc::RobotBase::IsReal()) return 0.0;
+
+  if (_smartMotionProfileTimer.Get() > 0.2_s) {
+    GenerateSMProfile();
+  }
+
+  const auto error = std::abs(_target - _encoder.GetPosition());
+  const auto tolerance = _pidController.GetSmartMotionAllowedClosedLoopError();
+  if (error < tolerance) return 0.0;
+
+  return _simSmartMotionProfile.Calculate(_smartMotionProfileTimer.Get())
+      .velocity.value();
 }

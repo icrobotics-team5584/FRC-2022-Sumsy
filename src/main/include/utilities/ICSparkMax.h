@@ -165,6 +165,7 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
   Mode _controlType = Mode::kDutyCycle;
   void SetInternalControlType(Mode controlType);
   void GenerateSMProfile();
+  double GetCurrentSMVelocity();
 
   // Sim device values (stuff that shows under Other Devices on Glass)
   frc::sim::SimDeviceSim _simDeviceSim{"SPARK MAX ", GetDeviceId()};
