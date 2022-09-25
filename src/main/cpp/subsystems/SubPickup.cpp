@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/SubPickup.h"
+#include <ctre/Phoenix.h>
 
 SubPickup::SubPickup() = default;
 
@@ -17,4 +18,16 @@ void SubPickup::Extender() {
 
 void SubPickup::Retractor() {
     _piston.Set(frc::DoubleSolenoid::Value::kReverse);
+}
+
+void SubPickup::Intake() {
+    _intakeMotor.Set(1);
+}
+
+void SubPickup::Outake() {
+    _intakeMotor.Set(-1);
+}
+
+void SubPickup::Stoptake() {
+    _intakeMotor.Set(0);
 }

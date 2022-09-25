@@ -5,7 +5,6 @@
 #pragma once
 
 #include <frc/TimedRobot.h>
-#include <frc/XboxController.h>
 #include <frc2/command/Command.h>
 #include <frc/filter/SlewRateLimiter.h>
 
@@ -37,8 +36,6 @@ class Robot : public frc::TimedRobot {
   frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
   frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
-
-  frc::XboxController m_controller{0};
 
   RobotContainer m_container;
 

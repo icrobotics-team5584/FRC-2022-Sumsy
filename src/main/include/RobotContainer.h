@@ -20,12 +20,14 @@
 class RobotContainer {
  public:
   RobotContainer();
-
   frc2::Command* GetAutonomousCommand();
+  double ControllerGetLeftX();
+  double ControllerGetLeftY();
+  double ControllerGetRightX();
 
  private:
   // The robot's subsystems and commands are defined here...
   void ConfigureButtonBindings();
-  frc::XboxController _controller {1};
+  frc::XboxController _controller {0};
   frc2::JoystickButton _rightBumber {&_controller, frc::XboxController::Button::kRightBumper};
 };

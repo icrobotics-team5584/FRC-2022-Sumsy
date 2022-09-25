@@ -25,8 +25,16 @@ namespace canid {
   constexpr int spmShooter2 = 99;
   constexpr int spmElevatorLeft = 13;
   constexpr int spmElevatorRight = 14;
+  constexpr int tfxIntake = 15;
+  constexpr int spmPayload = 99;
 }
 
 namespace pcm {
+  constexpr int solIntakeOut = 0;
+  constexpr int solIntakeIn = 1;
+}
+
+namespace dio {
+  constexpr int lineBreakPayload = 0;
 }
 
