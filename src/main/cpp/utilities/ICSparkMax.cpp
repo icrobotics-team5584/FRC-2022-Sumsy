@@ -19,14 +19,15 @@ ICSparkMax::ICSparkMax(int deviceID, Type type)
   }
 
   _pidController.SetSmartMotionMinOutputVelocity(0);
+  SetClosedLoopOutputRange(-1, 1);
 }
 
 void ICSparkMax::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddDoubleProperty(
-      "Position", [&] { return _encoder.GetPosition(); },
+      "Position", [&] { return _encoder->GetPosition(); },
       nullptr);  // setter is null, cannot set position directly
   builder.AddDoubleProperty(
-      "Velocity", [&] { return _encoder.GetVelocity(); }, nullptr);
+      "Velocity", [&] { return GetVelocity(); }, nullptr);
   builder.AddDoubleProperty(
       "Voltage", [&] { return GetSimVoltage().value(); }, nullptr);
   builder.AddBooleanProperty(
@@ -57,14 +58,13 @@ void ICSparkMax::InitSendable(wpi::SendableBuilder& builder) {
       [&](double F) { _pidController.SetFF(F); });
 }
 
-void ICSparkMax::SetTarget(double target, Mode controlType, int pidSlot,
+void ICSparkMax::SetTarget(double target, Mode controlType,
                            double arbFeedForward) {
   _target = target;
-  _pidSlot = pidSlot;
   _arbFeedForward = arbFeedForward;
   SetInternalControlType(controlType);
 
-  _pidController.SetReference(target, controlType, pidSlot, _arbFeedForward);
+  _pidController.SetReference(target, controlType, 0, _arbFeedForward);
   SyncSimPID();
 }
 
@@ -79,6 +79,17 @@ void ICSparkMax::SetVoltage(units::volt_t output) {
   SetTarget(output.value(), Mode::kVoltage);
 }
 
+void ICSparkMax::StopMotor() {
+  _target = 0;
+  SetInternalControlType(Mode::kDutyCycle);
+  CANSparkMax::StopMotor();
+}
+
+void ICSparkMax::SetInternalControlType(Mode controlType) {
+  _controlType = controlType;
+  _simControlMode.Set((int)_controlType);
+}
+
 void ICSparkMax::SetSmartMotionMaxAccel(double maxAcceleration) {
   _pidController.SetSmartMotionMaxAccel(maxAcceleration /
                                         _RPMpsToDesiredAccelUnits);
@@ -86,15 +97,26 @@ void ICSparkMax::SetSmartMotionMaxAccel(double maxAcceleration) {
 
 void ICSparkMax::SetSmartMotionMaxVelocity(double maxVelocity) {
   _pidController.SetSmartMotionMaxVelocity(
-      maxVelocity / _encoder.GetVelocityConversionFactor());
+      maxVelocity / _encoder->GetVelocityConversionFactor());
 }
 
 void ICSparkMax::SetConversionFactors(double rotationsToDesired,
                                       double RPMToDesired,
                                       double RPMpsToDesired) {
-  _encoder.SetPositionConversionFactor(rotationsToDesired);
-  _encoder.SetVelocityConversionFactor(RPMToDesired);
+  _encoder->SetPositionConversionFactor(rotationsToDesired);
+  _encoder->SetVelocityConversionFactor(RPMToDesired);
   _RPMpsToDesiredAccelUnits = RPMpsToDesired;
+}
+
+void ICSparkMax::UseAlternateEncoder(int countsPerRev) {
+  const double posConversion = _encoder->GetPositionConversionFactor();
+  const double velConversion = _encoder->GetVelocityConversionFactor();
+
+  _encoder = std::make_unique<rev::SparkMaxAlternateEncoder>(
+      CANSparkMax::GetAlternateEncoder(countsPerRev));
+  _pidController.SetFeedbackDevice(*_encoder);
+
+  SetConversionFactors(posConversion, velConversion, _RPMpsToDesiredAccelUnits);
 }
 
 void ICSparkMax::SetPIDFF(double P, double I, double D, double FF) {
@@ -106,12 +128,20 @@ void ICSparkMax::SetPIDFF(double P, double I, double D, double FF) {
 }
 
 void ICSparkMax::SetEncoderPosition(double position) {
-  _encoder.SetPosition(position);
+  _encoder->SetPosition(position);
 }
 
 void ICSparkMax::SetClosedLoopOutputRange(double minOutputPercent,
                                           double maxOutputPercent) {
   _pidController.SetOutputRange(minOutputPercent, maxOutputPercent);
+}
+
+double ICSparkMax::GetVelocity() {
+  if (frc::RobotBase::IsSimulation()) {
+    return _simVelocity.Get();
+  } else {
+    return _encoder->GetVelocity();
+  }
 }
 
 units::volt_t ICSparkMax::GetSimVoltage() {
@@ -123,14 +153,14 @@ units::volt_t ICSparkMax::GetSimVoltage() {
       break;
 
     case Mode::kVelocity:
-      output = units::volt_t{
-          _simController.Calculate(_encoder.GetVelocity(), _target) +
-          _pidController.GetFF() * _target + _arbFeedForward};
+      output =
+          units::volt_t{_simController.Calculate(GetVelocity(), _target) +
+                        _pidController.GetFF() * _target + _arbFeedForward};
       break;
 
     case Mode::kPosition:
       output = units::volt_t{
-          _simController.Calculate(_encoder.GetPosition(), _target) +
+          _simController.Calculate(_encoder->GetPosition(), _target) +
           _pidController.GetFF() * _target + _arbFeedForward};
       break;
 
@@ -139,10 +169,11 @@ units::volt_t ICSparkMax::GetSimVoltage() {
       break;
 
     case Mode::kSmartMotion:
-      output = units::volt_t{(_simController.Calculate(_encoder.GetVelocity(),
-                                                       GetCurrentSMVelocity()) +
-                              _pidController.GetFF() * GetCurrentSMVelocity() +
-                              _arbFeedForward)};
+      output = units::volt_t{
+          (_simController.Calculate(GetVelocity(), GetCurrentSMVelocity()) +
+           (_pidController.GetFF() / _encoder->GetVelocityConversionFactor()) *
+               GetCurrentSMVelocity() +
+           _arbFeedForward)};
       break;
 
     case Mode::kCurrent:
@@ -155,24 +186,13 @@ units::volt_t ICSparkMax::GetSimVoltage() {
                    "by ICSparkMax in Simulation\n";
       break;
   }
-  return std::clamp(output, -12_V, 12_V);
-}
-
-void ICSparkMax::StopMotor() {
-  _target = 0;
-  SetInternalControlType(Mode::kDutyCycle);
-  CANSparkMax::StopMotor();
-}
-
-void ICSparkMax::SetInternalControlType(Mode controlType) {
-  _controlType = controlType;
-  _simControlMode.Set((int)_controlType);
+  return std::clamp(output, _pidController.GetOutputMin() * 12_V,
+                    _pidController.GetOutputMax() * 12_V);
 }
 
 void ICSparkMax::UpdateSimEncoder(double position, double velocity) {
-  _encoder.SetPosition(position);
+  _encoder->SetPosition(position);
   _simVelocity.Set(velocity);
-  _prevEncoderPos = position;
 }
 
 void ICSparkMax::SyncSimPID() {
@@ -197,15 +217,14 @@ void ICSparkMax::GenerateSMProfile() {
 
   frc::TrapezoidProfile<units::meters>::Constraints constrainsts = {
       units::meters_per_second_t{_pidController.GetSmartMotionMaxVelocity() *
-                                 _encoder.GetVelocityConversionFactor()},
+                                 _encoder->GetVelocityConversionFactor()},
       units::meters_per_second_squared_t{
           _pidController.GetSmartMotionMaxAccel() * _RPMpsToDesiredAccelUnits}};
 
-  _simSmartMotionProfile = {
-      constrainsts,
-      {units::meter_t{_target}, 0_mps},
-      {units::meter_t{_encoder.GetPosition()},
-       units::meters_per_second_t{_encoder.GetVelocity()}}};
+  _simSmartMotionProfile = {constrainsts,
+                            {units::meter_t{_target}, 0_mps},
+                            {units::meter_t{_encoder->GetPosition()},
+                             units::meters_per_second_t{GetVelocity()}}};
 }
 
 double ICSparkMax::GetCurrentSMVelocity() {
@@ -215,7 +234,7 @@ double ICSparkMax::GetCurrentSMVelocity() {
     GenerateSMProfile();
   }
 
-  const auto error = std::abs(_target - _encoder.GetPosition());
+  const auto error = std::abs(_target - _encoder->GetPosition());
   const auto tolerance = _pidController.GetSmartMotionAllowedClosedLoopError();
   if (error < tolerance) return 0.0;
 

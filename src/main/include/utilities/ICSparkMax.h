@@ -14,6 +14,13 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
 
+/**
+ * Wrapper around the SPARK MAX class that adds better simulation support and
+ * some convenience features. Unlike the rev::CANSparkMax class, all encoder and
+ * PID functionality is built in, you do not need to create sperate objects.
+ * A sensible current limit is also automatically set depending on which motor
+ * Type is used.
+ */
 class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
  public:
   // Type of motor in use, only used for default current limiting setup
@@ -37,8 +44,7 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
    * Otherwise: Voltage Control: Voltage (volts) Velocity Control: Velocity
    * (RPM) Position Control: Position (Rotations) Current Control: Current
    * (Amps). The units can be changed for position and velocity by a scale
-   * factor using setPositionConversionFactor() and
-   * setVelocityConversionFactor().
+   * factor using SetConversionFactors().
    *
    * @param controlType Is the control type
    *
@@ -51,7 +57,7 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
    * mode, but before any current limits or ramp rates
    */
   void SetTarget(double target, rev::CANSparkMax::ControlType controlType,
-                 int pidSlot = 0, double arbFeedForward = 0.0);
+                 double arbFeedForward = 0.0);
 
   /**
    * Gets the current closed loop target. This will be in RPM for velocity
@@ -94,6 +100,24 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
   rev::CANSparkMax::ControlType GetControlType() { return _controlType; };
 
   /**
+   * Get the velocity of the motor. This returns the native units
+   * of 'RPM' by default, and can be changed by a scale factor
+   * using SetConversionFactors().
+   *
+   * @return Number the RPM of the motor
+   */
+  double GetVelocity();
+
+  /**
+   * Get the position of the motor. This returns the native units
+   * of 'rotations' by default, and can be changed by a scale factor
+   * using SetConversionFactors().
+   *
+   * @return Number of rotations of the motor
+   */
+  double GetPosition() { return _encoder->GetPosition(); };
+
+  /**
    * Common interface to stop the motor until Set is called again or
    * closed loop control is started.
    */
@@ -113,28 +137,100 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
    */
   void SetVoltage(units::volt_t output) override;
 
-  // Sendable setup, called when this is passed into smartDashbaord::PutData()
-  void InitSendable(wpi::SendableBuilder& builder) override;
-
+  /**
+   * Configure the maximum acceleration of the SmartMotion mode. This is the
+   * accleration that the motor velocity will increase at until the max
+   * velocity is reached
+   *
+   * @param maxAcceleration The maxmimum acceleration for the motion profile.
+   * In RPM per second by default and can be scaled with SetConversionFactors().
+   */
   void SetSmartMotionMaxAccel(double maxAcceleration);
 
+  /**
+   * Configure the maximum velocity of the SmartMotion mode. This is the
+   * velocity that is reached in the middle of the profile and is what the
+   * motor should spend most of its time at
+   *
+   * @param maxVelocity The maxmimum cruise velocity for the motion profile.
+   * In RPM by default and can be scaled with SetConversionFactors().
+   */
   void SetSmartMotionMaxVelocity(double maxVelocity);
 
+  /**
+   * Set the conversion factor for position, velocity and acceleration of the
+   * encoder. The native units of rotations, RPM and RPM per second are
+   * multiplied by these values before being used or returned.
+   */
   void SetConversionFactors(double rotationsToDesired, double RPMToDesired,
                             double RPMpsToDesired);
 
+  /**
+   * Set the Proportional, Integral and Derivative Gain constants of the PIDF
+   * controller on the SPARK MAX. This uses the Set Parameter API and should be
+   * used infrequently. The parameters do not presist unless burnFlash() is
+   * called.
+   *
+   * @param P The proportional gain value, must be positive
+   * @param I The Integral gain value, must be positive
+   * @param D The Derivative gain value, must be positive
+   * @param FF The Feed Forward gain value, must be positive. This is multiplied
+   * by the target before being added to the final output power.
+   */
   void SetPIDFF(double P, double I, double D, double FF = 0.0);
 
+  /**
+   * Set the position of the encoder.
+   *
+   * @param position Number of rotations of the motor
+   */
   void SetEncoderPosition(double position);
 
+  /**
+   * Set the min amd max output for the closed loop mode.
+   *
+   * This uses the Set Parameter API and should be used infrequently.
+   * The parameter does not presist unless burnFlash() is called.
+   *
+   * @param minOutputPercent Reverse power minimum to allowed
+   *
+   * @param maxOutputPercent Forward power maximum to allowed
+   */
   void SetClosedLoopOutputRange(double minOutputPercent,
                                 double maxOutputPercent);
 
+  /**
+   * Configure the allowed closed loop error of SmartMotion mode. This value
+   * is how much deviation from your setpoint is tolerated and is useful in
+   * preventing oscillation around your setpoint. When the true position is
+   * within tolerance, no power will be applied to the motor.
+   */
   void SetSmartMotionTolerance(double tolerance) {
     _pidController.SetSmartMotionAllowedClosedLoopError(tolerance);
   };
 
+  /**
+   * Switch to using an external encoder connected to the alternate encoder data
+   * port on the SPARK MAX. The pins on this port are defined as:
+   *
+   * Pin 4 (Forward Limit Switch): Index
+   * Pin 6 (Multi-function): Encoder A
+   * Pin 8 (Reverse Limit Switch): Encoder B
+   *
+   * This call will disable support for the limit switch inputs.
+   *
+   * @param countsPerRev The number of encoder counts per revolution. Leave as
+   * default for the REV through bore encoder.
+   */
+  void UseAlternateEncoder(int countsPerRev = 8192);
+
+  // Sendable setup, called when this is passed into smartDashbaord::PutData()
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
+  // Delete some SPARK MAX functions so user doesn't get multiple copies of
+  // friend objects.
   rev::SparkMaxRelativeEncoder GetEncoder() = delete;
+  rev::SparkMaxAlternateEncoder GetAlternateEncoder() = delete;
   rev::SparkMaxPIDController GetPIDController() = delete;
 
  private:
@@ -147,12 +243,11 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
 
   // Related REVLib objects
   rev::SparkMaxPIDController _pidController{CANSparkMax::GetPIDController()};
-  rev::SparkMaxRelativeEncoder _encoder{CANSparkMax::GetEncoder()};
-  double _prevEncoderPos = 0.0;
+  std::unique_ptr<rev::RelativeEncoder> _encoder =
+      std::make_unique<rev::SparkMaxRelativeEncoder>(CANSparkMax::GetEncoder());
   double _RPMpsToDesiredAccelUnits = 1.0;
 
   // PID simulation configuration
-  int _pidSlot = 0;
   bool _updatingTargetFromSendable = false;
   double _target = 0;
   double _arbFeedForward = 0.0;
