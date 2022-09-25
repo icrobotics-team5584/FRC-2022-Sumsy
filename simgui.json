@@ -10,6 +10,14 @@
         "header": {
           "open": true
         }
+      },
+      "window": {
+        "visible": false
+      }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
       }
     }
   },
@@ -43,7 +51,7 @@
     "Plot <0>": {
       "plots": [
         {
-          "height": 338,
+          "height": 542,
           "series": [
             {
               "color": [
@@ -71,6 +79,15 @@
                 1.0
               ],
               "id": "NT:/SmartDashboard/Left Elevator Motor/Position"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Left Elevator Motor/Smart Motion Velocity Target"
             }
           ]
         }

@@ -44,21 +44,19 @@ class SubElevator : public frc2::SubsystemBase {
  private:
  
   
-  const units::meters_per_second_t MAX_VELOCITY = 0.003_mps;
-  const units::meters_per_second_squared_t MAX_ACCERLATION = 1_mps_sq;
-  const units::kilogram_t CARRAGE_WEIGHT = 0.1_kg; 
+  const units::meters_per_second_t MAX_VELOCITY = 0.1_mps;
+  const units::meters_per_second_squared_t MAX_ACCERLATION = 0.1_mps_sq;
+  const units::kilogram_t CARRAGE_WEIGHT = 0.01_kg; 
 
-  static constexpr double kP = 0.05, kI = 0, kD = 0;
+  static constexpr double kP = 0.0, kI = 0, kD = 0, kFF = 4.7;
   const double GEARBOX_REDUCTION = 20;
   const units::meter_t DRUM_RADIUS = 0.05_m;
-  const double CONVERSTION_FACTOR = GEARBOX_REDUCTION * DRUM_RADIUS.value();
+  const double POS_CONVERSION_FACTOR = GEARBOX_REDUCTION * DRUM_RADIUS.value();
+  const double VEL_CONVERSION_FACTOR = POS_CONVERSION_FACTOR / 60;
 
    ICSparkMax _spmLeftElevator{canid::spmElevatorLeft,ICSparkMax::Type::NEO};
 
   ICSparkMax _spmRightElevator{canid::spmElevatorRight,ICSparkMax::Type::NEO};
-
-  rev::SparkMaxPIDController _pidLeftMotorController =
-      _spmLeftElevator.GetPIDControllerRef();
 
 //simulation code:
 frc::sim::ElevatorSim _elevatorSim{frc::DCMotor::NEO(2),GEARBOX_REDUCTION,CARRAGE_WEIGHT,DRUM_RADIUS,MIN_POSITION,THIRD_POSITION};

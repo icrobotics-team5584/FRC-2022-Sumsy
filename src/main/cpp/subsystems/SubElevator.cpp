@@ -6,13 +6,12 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 SubElevator::SubElevator() {
-    _pidLeftMotorController.SetP(kP);
-    _pidLeftMotorController.SetI(kI);
-    _pidLeftMotorController.SetD(kD);
-    _pidLeftMotorController.SetSmartMotionMaxAccel(MAX_ACCERLATION.value());
-    _pidLeftMotorController.SetSmartMotionMaxVelocity(MAX_VELOCITY.value());
+    _spmLeftElevator.SetPIDFF(kP, kI, kD, kFF);
+    _spmLeftElevator.SetConversionFactors(
+        POS_CONVERSION_FACTOR, VEL_CONVERSION_FACTOR, VEL_CONVERSION_FACTOR);
 
-    _spmLeftElevator.GetEncoderRef().SetPositionConversionFactor(CONVERSTION_FACTOR);
+    _spmLeftElevator.SetSmartMotionMaxAccel(MAX_ACCERLATION.value());
+    _spmLeftElevator.SetSmartMotionMaxVelocity(MAX_VELOCITY.value());
 
     _spmRightElevator.Follow(_spmLeftElevator);
     _spmRightElevator.SetSmartCurrentLimit(40);
@@ -24,7 +23,7 @@ SubElevator::SubElevator() {
 // This method will be called once per scheduler run
 void SubElevator::Periodic() {
 frc::SmartDashboard::PutNumber("Elevator Target Value", _spmLeftElevator.GetTarget());
-frc::SmartDashboard::PutNumber("Elevator Current Position", _spmLeftElevator.GetEncoderRef().GetPosition());
+frc::SmartDashboard::PutNumber("Elevator Current Position", _spmLeftElevator.GetPosition());
 
 
 
