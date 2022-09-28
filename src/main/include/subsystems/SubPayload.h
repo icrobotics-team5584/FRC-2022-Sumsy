@@ -12,8 +12,8 @@
 class SubPayload : public frc2::SubsystemBase {
  public:
   SubPayload();
-
   static SubPayload &GetInstance() {static SubPayload inst; return inst;}
+
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -33,6 +33,6 @@ class SubPayload : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   rev::CANSparkMax _spmPayload{canid::spmPayload, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+  rev::CANSparkMax _spmPayloadFollow{canid::spmPayloadFollow, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
   frc::DigitalInput _LineBreakPayload{dio::lineBreakPayload};
-
 };
