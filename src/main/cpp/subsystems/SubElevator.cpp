@@ -51,4 +51,66 @@ void SubElevator::SimulationPeriodic() {
   auto verticleVelocity = _elevatorSim.GetVelocity(); //elevator sim gets the velocity 
   units::meter_t verticleDistence = _elevatorSim.GetPosition();//elevator sim gets the verticle distence
   _spmLeftElevator.UpdateSimEncoder(verticleDistence.value(),verticleVelocity.value());//position of the encoder is the verticle distence
+
+
+// Don't let the Elevator kill itself
+  if ((AtLowerLimit() && GoingDown())) {
+    frc::SmartDashboard::PutBoolean("Elevator Lower Safety", true);
+    _targetPosition = FIRST_POSITION();
+    _spmLeftElevator.SetTarget(_targetPosition, rev::CANSparkMax::ControlType::kSmartMotion);
+    _spmLeftElevator.Set(0);
+  } else {
+    frc::SmartDashboard::PutBoolean("Elevator LowerLeft Safety", false);
+  }
+  if ((AtLowerLimit() && GoingDown())) {
+    _targetPosition = FIRST_POSITION();
+    _spmRightElevator.SetTarget(_targetPosition, rev::CANSparkMax::ControlType::kSmartMotion);
+    _spmRightElevator.Set(0);
+    frc::SmartDashboard::PutBoolean("Elevator LowerRight Safety", true);
+  } else {
+    frc::SmartDashboard::PutBoolean("Elevator LowerRight Safety", false);
+  }
+
+  // Don't let the Elevator kill itself pt.2
+  if ((AtUpperLimit() && GoingUp())) {
+    frc::SmartDashboard::PutBoolean("Elevator Upper Safety", true);
+    _targetPosition = THIRD_POSITION();
+    _spmLeftElevator.SetTarget(_targetPosition, rev::CANSparkMax::ControlType::kSmartMotion);
+    _spmLeftElevator.Set(0);
+  } else {
+    frc::SmartDashboard::PutBoolean("Elevator UpperLeft Safety", false);
+  }
+  if ((AtUpperLimit() && GoingUp())) {
+    _targetPosition = THIRD_POSITION();
+    _spmRightElevator.SetTarget(_targetPosition, rev::CANSparkMax::ControlType::kSmartMotion);
+    _spmRightElevator.Set(0);
+    frc::SmartDashboard::PutBoolean("Elevator UpperRight Safety", true);
+  } else {
+    frc::SmartDashboard::PutBoolean("Elevator UpperRight Safety", false);
+  }
+
+
+ }
+bool SubElevator::AtLowerLimit() { return !_Lowerlmt.Get(); }
+bool SubElevator::AtUpperLimit() { return !_Upperlmt.Get(); }
+
+bool SubElevator::GoingDown() {
+  if (_inSmartMotionMode) {
+    return _spmLeftElevator.GetPosition() > _targetPosition ||
+           _spmLeftElevator.GetPosition() > _targetPosition;
+  } else {
+    return _spmRightElevator.Get() < 0 || _spmRightElevator.Get() < 0;
+  }
+  
 }
+
+bool SubElevator::GoingUp() {
+  if (_inSmartMotionMode) {
+    return _spmLeftElevator.GetPosition() < _targetPosition ||
+           _spmRightElevator.GetPosition() < _targetPosition;
+  } else {
+    return _spmRightElevator.Get() > 0 || _spmRightElevator.Get() > 0;
+  }
+  
+}
+

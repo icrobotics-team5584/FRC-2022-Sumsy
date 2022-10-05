@@ -37,5 +37,7 @@ namespace pcm {
 
 namespace dio {
   constexpr int lineBreakPayload = 0;
+  constexpr int lmtLowerElevator = 1;
+  constexpr int lmtUpperElevator = 2;
 }
 
