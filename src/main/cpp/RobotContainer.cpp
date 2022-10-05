@@ -4,6 +4,7 @@
 
 #include "RobotContainer.h"
 #include "commands/CmdDeployPickup.h"
+#include "commands/CmdPayloadOutake.h"
 
 #include <frc2/command/button/JoystickButton.h>
 #include "commands/CmdElevatorSequence.h"

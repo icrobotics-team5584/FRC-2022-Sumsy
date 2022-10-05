@@ -14,6 +14,7 @@
 #include <wpi/numbers>
 #include <frc/smartdashboard/Field2d.h>
 
+#include "Constants.h"
 #include "utilities/SwerveModule.h"
 
 class SubDriveBase : public frc2::SubsystemBase {
@@ -51,10 +52,12 @@ class SubDriveBase : public frc2::SubsystemBase {
   const double BACK_LEFT_MAG_OFFSET = 108.63;//-149.68;//148.7;
   const double BACK_RIGHT_MAG_OFFSET = -31.64;//-44.82;//-136.05;
 
-  SwerveModule m_frontLeft{1, 2, 11, FRONT_LEFT_MAG_OFFSET};
-  SwerveModule m_frontRight{7, 8, 10, FRONT_RIGHT_MAG_OFFSET};
-  SwerveModule m_backLeft{3, 4, 9, BACK_LEFT_MAG_OFFSET};
-  SwerveModule m_backRight{5, 6, 12, BACK_RIGHT_MAG_OFFSET};
+  SwerveModule m_frontLeft{canid::tfxDriveBaseFrontLeftDrive, canid::tfxDriveBaseFrontLeftTurn, canid::tfxDriveBaseFrontLeftEncoder, FRONT_LEFT_MAG_OFFSET};
+  SwerveModule m_frontRight{canid::tfxDriveBaseFrontRightDrive, canid::tfxDriveBaseFrontRightTurn, canid::tfxDriveBaseFrontRightEncoder, FRONT_RIGHT_MAG_OFFSET};
+  SwerveModule m_backLeft{canid::tfxDriveBaseBackLeftDrive, canid::tfxDriveBaseBackLeftTurn, canid::tfxDriveBaseBackLeftEncoder, BACK_LEFT_MAG_OFFSET};
+  SwerveModule m_backRight{canid::tfxDriveBaseBackRightDrive, canid::tfxDriveBaseBackRightTurn, canid::tfxDriveBaseBackRightEncoder, BACK_RIGHT_MAG_OFFSET};
+
+   
 
   AHRS m_gyro{frc::SerialPort::kMXP};
 
