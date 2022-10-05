@@ -30,4 +30,5 @@ class RobotContainer {
   frc::XboxController _controller {0};
   frc2::JoystickButton _rightBumber {&_controller, frc::XboxController::Button::kRightBumper};
   frc2::JoystickButton _leftBumber {&_controller, frc::XboxController::Button::kLeftBumper};
+  frc2::JoystickButton _start {&_controller, frc::XboxController::Button::kStart};
 };

@@ -5,6 +5,7 @@
 #include "RobotContainer.h"
 #include "commands/CmdDeployPickup.h"
 #include "commands/CmdPayloadOutake.h"
+#include "commands/CmdResetRotation.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -21,6 +22,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Btn{&_controller, BtnId::buttonHere}.WhenPressed(commandHere{});
   _rightBumber.WhileHeld(CmdDeployPickup{});
   _leftBumber.WhileHeld(CmdPayloadOutake{});
+  _start.WhenPressed(CmdResetRotation{});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
