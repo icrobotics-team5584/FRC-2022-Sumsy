@@ -13,6 +13,9 @@
 #include <utilities/ICSparkMax.h>
 #include <frc/simulation/ElevatorSim.h>
 #include <units/mass.h>
+#include <frc/DigitalInput.h>
+#include <rev/SparkMaxRelativeEncoder.h>
+#include <utilities/ICSparkMax.h>
 
 class SubElevator : public frc2::SubsystemBase {
  public:
@@ -34,6 +37,10 @@ class SubElevator : public frc2::SubsystemBase {
   void Extendthird();   // extends the elevators to the third position
   void Retract();       // retracts the elevators one position
   void Reset();         // resets the evevators to the lowest position
+  bool AtLowerLimit(); //Check if lower limit switch is hit
+  bool AtUpperLimit(); //Check if upper limit switch is hit
+  bool GoingUp(); //check if the target position is above current position
+  bool GoingDown(); //Check if the target position is below current position
 
 
   static constexpr units::meter_t MIN_POSITION = 0_m;
@@ -63,4 +70,11 @@ frc::sim::ElevatorSim _elevatorSim{frc::DCMotor::NEO(2),GEARBOX_REDUCTION,CARRAG
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
+  frc::DigitalInput _Lowerlmt{dio::lmtLowerElevator};
+  frc::DigitalInput _Upperlmt{dio::lmtUpperElevator};
+
+  bool _inSmartMotionMode = false;
+  int _targetPosition = 0;
+
+  
 };
