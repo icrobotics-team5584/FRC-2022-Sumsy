@@ -8,6 +8,7 @@
 #include <frc/RobotBase.h>
 
 SubDriveBase::SubDriveBase(){
+  m_gyro.Calibrate();
   frc::SmartDashboard::PutData("field", &_fieldDisplay);
 }
 
@@ -15,6 +16,7 @@ SubDriveBase::SubDriveBase(){
 void SubDriveBase::Periodic() {
   frc::SmartDashboard::PutNumber("heading", GetHeading().Degrees().value());
   frc::SmartDashboard::PutNumber("gyro", m_gyro.GetAngle());
+  frc::SmartDashboard::PutBoolean("gyro is callibrating", m_gyro.IsCalibrating());
   UpdateOdometry();
 }
 
