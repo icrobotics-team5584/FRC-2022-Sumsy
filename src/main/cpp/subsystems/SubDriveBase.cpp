@@ -61,3 +61,4 @@ void SubDriveBase::UpdateOdometry() {
   _poseEstimator.Update(GetHeading(), fl, fr, bl, br);
   _fieldDisplay.SetRobotPose(_poseEstimator.GetEstimatedPosition());
 }
+

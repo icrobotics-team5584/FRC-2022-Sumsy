@@ -16,11 +16,11 @@ RobotContainer::RobotContainer(){
 void RobotContainer::ConfigureButtonBindings() {
   using BtnId = frc::XboxController::Button;
   using Btn = frc2::JoystickButton; 
-
   // Configure your button bindings here
   // Btn{&_controller, BtnId::buttonHere}.WhenPressed(commandHere{});
-  _rightBumber.WhileHeld(CmdDeployPickup{});
-  _leftBumber.WhileHeld(CmdPayloadOutake{});
+  Btn{&_controller, BtnId::kRightBumper}.WhileHeld(CmdDeployPickup{});
+  Btn{&_controller,BtnId::kLeftBumper}.WhileHeld(CmdPayloadOutake{});
+
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
@@ -39,3 +39,4 @@ double RobotContainer::ControllerGetLeftY() {
 double RobotContainer::ControllerGetRightX() {
   return _controller.GetRightX();
 }
+
