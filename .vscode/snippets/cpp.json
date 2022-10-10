@@ -8,5 +8,13 @@
 		"prefix" : "ics",
 		"body": "ICSparkMax _$1{canid::$2, ICSparkMax::Type::$3};",
 		"descrption" : "Construct an IC Spark Max object (Spark max with simulation support and convenience features)"
+	},
+	"Put number to the SmartDashBoard" :{
+		"prefix": "dbn",
+		"body": "frc::SmartDashboard::PutNumber(\"$1\", $2);"
+	},
+	"Put boolean to the SmartDashBoard" :{
+		"prefix": "dbb",
+		"body": "frc::SmartDashboard::PutBoolean(\"$1\", $2);"
 	}
 }
