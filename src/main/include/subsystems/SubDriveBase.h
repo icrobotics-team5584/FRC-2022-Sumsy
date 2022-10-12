@@ -12,7 +12,6 @@
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <wpi/numbers>
 #include <frc/controller/PIDController.h>
-
 #include "utilities/SwerveModule.h"
 
 class SubDriveBase : public frc2::SubsystemBase {
@@ -24,8 +23,8 @@ class SubDriveBase : public frc2::SubsystemBase {
     static SubDriveBase inst;
     return inst;
   }
-
-  void DriveToTarget();
+  void UpdatePidControllerDrive();
+  void DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance);
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
