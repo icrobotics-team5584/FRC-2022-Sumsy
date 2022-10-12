@@ -6,10 +6,12 @@
 #include "commands/CmdDeployPickup.h"
 #include "commands/CmdPayloadOutake.h"
 #include "commands/CmdResetRotation.h"
+#include "subsystems/SubDriveBase.h"
+#include "commands/CmdDriveRobot.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
-
+  SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
   // Configure the button bindings
   ConfigureButtonBindings();
 }

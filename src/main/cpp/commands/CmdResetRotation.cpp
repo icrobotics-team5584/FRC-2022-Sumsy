@@ -22,5 +22,5 @@ void CmdResetRotation::End(bool interrupted) {}
 
 // Returns true when the command should end.
 bool CmdResetRotation::IsFinished() {
-  return false;
+  return true;
 }
