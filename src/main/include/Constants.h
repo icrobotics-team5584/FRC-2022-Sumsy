@@ -14,18 +14,34 @@
  * they are needed.
  */
 
-namespace can {
-  constexpr int tfxDriveBaseFrontRight = 1; //check what prefix it should have with liam
-  constexpr int tfxDriveBaseBackRight = 2;
-  constexpr int tfxDriveBaseFrontLeft = 3;
-  constexpr int tfxDriveBaseBackLeft = 4;
-  constexpr int spmStorage = 99;
-  constexpr int spmIntake = 99;
-  constexpr int spmShooter1 = 99;
-  constexpr int spmShooter2 = 99;
-  
+namespace canid {
+  constexpr int tfxDriveBaseFrontLeftDrive = 1;
+  constexpr int tfxDriveBaseFrontLeftTurn = 2;
+  constexpr int tfxDriveBaseFrontLeftEncoder = 11;
+
+  constexpr int tfxDriveBaseFrontRightDrive = 7;
+  constexpr int tfxDriveBaseFrontRightTurn = 8;
+  constexpr int tfxDriveBaseFrontRightEncoder = 10;
+
+  constexpr int tfxDriveBaseBackLeftDrive = 3;
+  constexpr int tfxDriveBaseBackLeftTurn = 4;
+  constexpr int tfxDriveBaseBackLeftEncoder = 9;
+
+  constexpr int tfxDriveBaseBackRightDrive = 5;
+  constexpr int tfxDriveBaseBackRightTurn = 6;
+  constexpr int tfxDriveBaseBackRightEncoder = 12;
+
+  constexpr int tfxIntake = 14;
+  constexpr int spmPayload = 99;
+  constexpr int spmPayloadFollow = 98;
 }
 
 namespace pcm {
+  constexpr int solIntakeOut = 0;
+  constexpr int solIntakeIn = 1;
+}
+
+namespace dio {
+  constexpr int lineBreakPayload = 0;
 }
 

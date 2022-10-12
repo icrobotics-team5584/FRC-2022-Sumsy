@@ -1,6 +1,8 @@
 #include "utilities/SwerveModule.h"
+#include "utilities/Conversions.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 #include <frc/MathUtil.h>
+#include <frc/RobotBase.h>
 
 SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID,
                            int canTurnEncoderID, double cancoderMagOffset)
@@ -61,10 +63,23 @@ void SwerveModule::SendSensorsToDash() {
 }
 
 frc::Rotation2d SwerveModule::GetAngle() {
-  const double positionInTics = _canTurnMotor.GetSelectedSensorPosition();
-  const double positionInRevolutions = positionInTics / TICS_PER_TURNING_WHEEL_REVOLUTION;
-  const double positionInDegrees = positionInRevolutions * 360;
-  return frc::Rotation2d(units::degree_t(positionInDegrees));
+  // If in simulation, pretend swerve is always at target state
+  const double rawPos = frc::RobotBase::IsReal()
+                            ? _canTurnMotor.GetSelectedSensorPosition()
+                            : _canTurnMotor.GetClosedLoopTarget();
+  return Conversions::TicsToRotation2d(rawPos, TICS_PER_TURNING_WHEEL_REVOLUTION);
+}
+
+units::meters_per_second_t SwerveModule::GetSpeed() {
+  // If in simulation, pretend swerve is always at target state
+  const double rawSpeed = frc::RobotBase::IsReal()
+                            ? _canDriveMotor.GetSelectedSensorVelocity()
+                            : _canDriveMotor.GetClosedLoopTarget();
+  return Conversions::FalconVelToMPS(rawSpeed, WHEEL_RADIUS);
+}
+
+frc::SwerveModuleState SwerveModule::GetState() {
+  return {GetSpeed(), GetAngle()};
 }
 
 void SwerveModule::SetDesiredAngle(units::degree_t angle) {
@@ -91,9 +106,5 @@ void SwerveModule::SyncSensors() {
   double cancoderDegrees = _canTurnEncoder.GetAbsolutePosition();
   double cancoderRevolutions = cancoderDegrees/360;
   int cancoderPosInFalconTics = cancoderRevolutions*TICS_PER_TURNING_WHEEL_REVOLUTION;
-
-  // _canTurnMotor
-  //   .GetSensorCollection()
-  //   .SetIntegratedSensorPosition(cancoderPosInFalconTics);
   _canTurnMotor.SetSelectedSensorPosition(cancoderPosInFalconTics);
 }

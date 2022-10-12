@@ -6,12 +6,16 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <frc/AnalogGyro.h>
-#include <frc/ADXRS450_Gyro.h>
+#include <AHRS.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <wpi/numbers>
 #include <frc/controller/PIDController.h>
+#include <frc/smartdashboard/Field2d.h>
+
+#include "Constants.h"
 #include "utilities/SwerveModule.h"
 
 class SubDriveBase : public frc2::SubsystemBase {
@@ -43,6 +47,7 @@ class SubDriveBase : public frc2::SubsystemBase {
    * Will be called periodically whenever the CommandScheduler runs.
    */
   void Periodic() override;
+  void ResetGyroHeading();
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -57,12 +62,14 @@ class SubDriveBase : public frc2::SubsystemBase {
   const double BACK_LEFT_MAG_OFFSET = 108.63;//-149.68;//148.7;
   const double BACK_RIGHT_MAG_OFFSET = -31.64;//-44.82;//-136.05;
 
-  SwerveModule m_frontLeft{1, 2, 11, FRONT_LEFT_MAG_OFFSET};
-  SwerveModule m_frontRight{7, 8, 10, FRONT_RIGHT_MAG_OFFSET};
-  SwerveModule m_backLeft{3, 4, 9, BACK_LEFT_MAG_OFFSET};
-  SwerveModule m_backRight{5, 6, 12, BACK_RIGHT_MAG_OFFSET};
+  SwerveModule m_frontLeft{canid::tfxDriveBaseFrontLeftDrive, canid::tfxDriveBaseFrontLeftTurn, canid::tfxDriveBaseFrontLeftEncoder, FRONT_LEFT_MAG_OFFSET};
+  SwerveModule m_frontRight{canid::tfxDriveBaseFrontRightDrive, canid::tfxDriveBaseFrontRightTurn, canid::tfxDriveBaseFrontRightEncoder, FRONT_RIGHT_MAG_OFFSET};
+  SwerveModule m_backLeft{canid::tfxDriveBaseBackLeftDrive, canid::tfxDriveBaseBackLeftTurn, canid::tfxDriveBaseBackLeftEncoder, BACK_LEFT_MAG_OFFSET};
+  SwerveModule m_backRight{canid::tfxDriveBaseBackRightDrive, canid::tfxDriveBaseBackRightTurn, canid::tfxDriveBaseBackRightEncoder, BACK_RIGHT_MAG_OFFSET};
 
-  frc::ADXRS450_Gyro m_gyro;
+   
+
+  AHRS m_gyro{frc::SerialPort::kMXP};
 
   frc::SwerveDriveKinematics<4> m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
@@ -71,5 +78,11 @@ class SubDriveBase : public frc2::SubsystemBase {
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, m_gyro.GetRotation2d()};
 
   frc::PIDController Xcontroller{0.1,0,0};
+  frc::SwerveDrivePoseEstimator<4> _poseEstimator{
+      frc::Rotation2d(), frc::Pose2d(), m_kinematics, 
+      {0.0,0.0,0.0}, {0.00}, {0.0,0.0,0.0} 
+  };
+
+  frc::Field2d _fieldDisplay;
 };
 
