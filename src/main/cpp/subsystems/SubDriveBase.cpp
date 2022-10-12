@@ -64,10 +64,7 @@ void SubDriveBase::UpdateOdometry() {
   _fieldDisplay.SetRobotPose(_poseEstimator.GetEstimatedPosition());
 }
 
-<<<<<<< HEAD
-=======
 
 void SubDriveBase::ResetGyroHeading() {
   m_gyro.Reset();
 }
->>>>>>> NavXReset

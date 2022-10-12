@@ -28,10 +28,7 @@ class RobotContainer {
   // The robot's subsystems and commands are defined here...
   void ConfigureButtonBindings();
   frc::XboxController _controller {0};
-<<<<<<< HEAD
-=======
   frc2::JoystickButton _rightBumber {&_controller, frc::XboxController::Button::kRightBumper};
   frc2::JoystickButton _leftBumber {&_controller, frc::XboxController::Button::kLeftBumper};
   frc2::JoystickButton _start {&_controller, frc::XboxController::Button::kStart};
->>>>>>> NavXReset
 };

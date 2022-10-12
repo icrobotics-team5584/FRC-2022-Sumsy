@@ -22,8 +22,8 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
   // Btn{&_controller, BtnId::buttonHere}.WhenPressed(commandHere{});
   Btn{&_controller, BtnId::kRightBumper}.WhileHeld(CmdDeployPickup{});
-  Btn{&_controller,BtnId::kLeftBumper}.WhileHeld(CmdPayloadOutake{});
-  _start.WhenPressed(CmdResetRotation{});
+  Btn{&_controller, BtnId::kLeftBumper}.WhileHeld(CmdPayloadOutake{});
+  Btn{&_controller, BtnId::kStart}.WhenPressed(CmdResetRotation{});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
