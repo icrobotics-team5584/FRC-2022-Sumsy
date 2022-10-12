@@ -20,29 +20,32 @@ void SubDriveBase::Periodic() {
   UpdateOdometry();
 }
 
-void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
-                       units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative) {
-  auto states = m_kinematics.ToSwerveModuleStates(
-      fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+void SubDriveBase::Drive(units::meters_per_second_t xSpeed, units::meters_per_second_t ySpeed, units::radians_per_second_t rot, bool fieldRelative) {
+
+  // Get states of all swerve modules
+  auto states = m_kinematics.ToSwerveModuleStates( fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
                           xSpeed, ySpeed, rot, GetHeading())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
+  // Set speed limit and apply speed limit to all modules
   m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
 
+  // Setting modules from aquired states
   auto [fl, fr, bl, br] = states;
-
   m_frontLeft.SetDesiredState(fl);
   m_frontRight.SetDesiredState(fr);
   m_backLeft.SetDesiredState(bl);
   m_backRight.SetDesiredState(br);
 
+  // Check if robot is in simulation. 
+  // Manualy adjusting gyro by calculating rotation in simulator as gyro is not enabled in simulation
   if (!frc::RobotBase::IsReal()) {
     double degPer20MS = units::degrees_per_second_t(rot).value() / 20;
     m_gyro.SetAngleAdjustment(GetHeading().Degrees().value() + degPer20MS);
   }
 }
 
+// Syncs encoder values when the robot is turned on
 void SubDriveBase::SyncSensors() {
   m_frontLeft.SyncSensors();
   m_frontRight.SyncSensors();
@@ -51,10 +54,12 @@ void SubDriveBase::SyncSensors() {
   m_gyro.Calibrate();
 }
 
+// Convertion from 0-360 from gyro to -180 to 180
 frc::Rotation2d SubDriveBase::GetHeading() {
   return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
 }
 
+// calculates the relative field location
 void SubDriveBase::UpdateOdometry() {
   auto fl = m_frontLeft.GetState();
   auto fr = m_frontLeft.GetState();
