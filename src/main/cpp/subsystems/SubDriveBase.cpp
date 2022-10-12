@@ -15,6 +15,8 @@ void SubDriveBase::Periodic() {
   m_frontRight.SendSensorsToDash();
   m_backLeft.SendSensorsToDash();
   m_backRight.SendSensorsToDash();
+
+  UpdatePidControllerDrive();
 }
 
 void SubDriveBase::Drive(units::meters_per_second_t xSpeed,
@@ -47,6 +49,25 @@ frc::Rotation2d SubDriveBase::GetHeading() {
   return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
 }
 
-void SubDriveBase::DriveToTarget() {
-  
+void SubDriveBase::DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance) {
+   double speed = Xcontroller.Calculate(xDistance.value(), targetDistance.value());
+   Drive(speed*1_mps, 0_mps, 0_rad_per_s, false);
 }
+
+//void SubDriveBase::SetTargetRpm(double rpm){
+   // _controller.SetSetpoint(rpm);
+//}
+
+void SubDriveBase::UpdatePidControllerDrive() {
+    /*double feedForward = (1.0f/5300.0f)* _controller.GetSetpoint();
+    double _output = _controller.Calculate(_encShooter1.GetVelocity()) + feedForward;
+    if (_output >= 0) {
+        _spmShooter1.SetVoltage(units::volt_t(_output*12)); 
+    } else {
+       // _spmShooter1.Set(0);
+    } */
+}
+//void SubShooter::Stop() {
+   // SetTargetRpm(0);
+   //_shouldTrackTarget = false;
+//}
