@@ -46,3 +46,7 @@ void SubDriveBase::SyncSensors() {
 frc::Rotation2d SubDriveBase::GetHeading() {
   return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
 }
+
+void SubDriveBase::DriveToTarget() {
+  
+}

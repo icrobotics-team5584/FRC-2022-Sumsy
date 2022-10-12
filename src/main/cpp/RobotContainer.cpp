@@ -3,9 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+#include "subsystems/SubPhotonVision.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
+  SubPhotonVision::GetInstance();
 
   // Configure the button bindings
   ConfigureButtonBindings();

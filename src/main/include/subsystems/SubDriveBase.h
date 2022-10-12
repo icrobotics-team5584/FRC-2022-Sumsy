@@ -11,12 +11,21 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <wpi/numbers>
+#include <frc/controller/PIDController.h>
 
 #include "utilities/SwerveModule.h"
 
 class SubDriveBase : public frc2::SubsystemBase {
  public:
   SubDriveBase();
+
+   static SubDriveBase &GetInstance()
+  {
+    static SubDriveBase inst;
+    return inst;
+  }
+
+  void DriveToTarget();
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
@@ -61,5 +70,7 @@ class SubDriveBase : public frc2::SubsystemBase {
       m_backRightLocation};
 
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, m_gyro.GetRotation2d()};
+
+  frc::PIDController Xcontroller{0.1,0,0};
 };
 
