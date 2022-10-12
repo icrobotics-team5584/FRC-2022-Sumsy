@@ -5,10 +5,13 @@
 #include "RobotContainer.h"
 #include "commands/CmdDeployPickup.h"
 #include "commands/CmdPayloadOutake.h"
+#include "commands/CmdResetRotation.h"
+#include "subsystems/SubDriveBase.h"
+#include "commands/CmdDriveRobot.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
-
+  SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
   // Configure the button bindings
   ConfigureButtonBindings();
 }
@@ -20,7 +23,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Btn{&_controller, BtnId::buttonHere}.WhenPressed(commandHere{});
   Btn{&_controller, BtnId::kRightBumper}.WhileHeld(CmdDeployPickup{});
   Btn{&_controller,BtnId::kLeftBumper}.WhileHeld(CmdPayloadOutake{});
-
+  _start.WhenPressed(CmdResetRotation{});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

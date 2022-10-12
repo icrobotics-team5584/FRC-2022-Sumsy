@@ -6,8 +6,6 @@
 
 #include <frc/TimedRobot.h>
 #include <frc2/command/Command.h>
-#include <frc/filter/SlewRateLimiter.h>
-
 #include "subsystems/SubDriveBase.h"
 #include "RobotContainer.h"
 
@@ -24,19 +22,11 @@ class Robot : public frc::TimedRobot {
   void TestPeriodic() override;
   void SimulationInit() override;
   void SimulationPeriodic() override;
-  void DriveWithJoystick(bool fieldRelative);
 
  private:
   // Have it null by default so that if testing teleop it
   // doesn't have undefined behavior and potentially crash.
   frc2::Command* m_autonomousCommand = nullptr;
-
-  SubDriveBase m_swerve;
-
-  frc::SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
-  frc::SlewRateLimiter<units::scalar> m_rotLimiter{3 / 1_s};
-
   RobotContainer m_container;
 
 };

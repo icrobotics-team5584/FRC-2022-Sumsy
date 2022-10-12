@@ -21,6 +21,8 @@ class SubDriveBase : public frc2::SubsystemBase {
  public:
   SubDriveBase();
 
+  static SubDriveBase &GetInstance() {static SubDriveBase inst; return inst;}
+
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
              bool fieldRelative);
@@ -38,6 +40,7 @@ class SubDriveBase : public frc2::SubsystemBase {
    * Will be called periodically whenever the CommandScheduler runs.
    */
   void Periodic() override;
+  void ResetGyroHeading();
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

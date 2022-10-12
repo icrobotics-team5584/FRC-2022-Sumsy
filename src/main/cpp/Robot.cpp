@@ -6,32 +6,8 @@
 #include "RobotContainer.h"
 #include <frc2/command/CommandScheduler.h>
 
-void Robot::DriveWithJoystick(bool fieldRelative) {
-  const double deadband = 0.1;
-
-  // Get the x speed. We are inverting this because Xbox controllers return
-  // negative values when we push forward.
-  const auto xSpeed = -m_xspeedLimiter.Calculate(
-                          frc::ApplyDeadband(m_container.ControllerGetLeftY(), deadband)) *
-                      SubDriveBase::kMaxSpeed;
-  // Get the y speed or sideways/strafe speed. We are inverting this because
-  // we want a positive value when we pull to the left. Xbox controllers
-  // return positive values when you pull to the right by default.
-  const auto ySpeed = m_yspeedLimiter.Calculate(
-                          frc::ApplyDeadband(m_container.ControllerGetLeftX(), deadband)) *
-                      SubDriveBase::kMaxSpeed;
-  // Get the rate of angular rotation. We are inverting this because we want a
-  // positive value when we pull to the left (remember, CCW is positive in
-  // mathematics). Xbox controllers return positive values when you pull to
-  // the right by default.
-  const auto rot = m_rotLimiter.Calculate(
-                       frc::ApplyDeadband(m_container.ControllerGetRightX(), deadband)) *
-                   SubDriveBase::kMaxAngularSpeed;
-  m_swerve.Drive(xSpeed, ySpeed, rot, fieldRelative);
-}
-
 void Robot::RobotInit() {
-  m_swerve.SyncSensors();
+  SubDriveBase::GetInstance().SyncSensors();
 }
 
 /**
@@ -84,9 +60,7 @@ void Robot::TeleopInit() {
  * This function is called periodically during operator control.
  */
 
-void Robot::TeleopPeriodic() {
-  DriveWithJoystick(true);
-}
+void Robot::TeleopPeriodic() {}
 
 /**
  * This function is called periodically during test mode.
