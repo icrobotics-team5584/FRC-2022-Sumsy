@@ -12,6 +12,7 @@
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <wpi/numbers>
+#include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/Field2d.h>
 
 #include "Constants.h"
@@ -21,7 +22,13 @@ class SubDriveBase : public frc2::SubsystemBase {
  public:
   SubDriveBase();
 
-  static SubDriveBase &GetInstance() {static SubDriveBase inst; return inst;}
+   static SubDriveBase &GetInstance()
+  {
+    static SubDriveBase inst;
+    return inst;
+  }
+  void UpdatePidControllerDrive();
+  void DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance);
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
@@ -70,6 +77,7 @@ class SubDriveBase : public frc2::SubsystemBase {
 
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, m_gyro.GetRotation2d()};
 
+  frc::PIDController Xcontroller{0.1,0,0};
   frc::SwerveDrivePoseEstimator<4> _poseEstimator{
       frc::Rotation2d(), frc::Pose2d(), m_kinematics, 
       {0.0,0.0,0.0}, {0.00}, {0.0,0.0,0.0} 
