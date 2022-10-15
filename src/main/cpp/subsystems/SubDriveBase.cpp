@@ -91,6 +91,10 @@ void SubDriveBase::UpdateOdometry() {
   _fieldDisplay.SetRobotPose(_poseEstimator.GetEstimatedPosition());
 }
 
+void SubDriveBase::DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t vel, frc::Rotation2d& rot) {
+  auto driveSpeeds = _driveController.Calculate(_poseEstimator.GetEstimatedPosition(), pos, vel, rot);
+  Drive(driveSpeeds.vx, driveSpeeds.vy, driveSpeeds.omega, true);
+}
 
 void SubDriveBase::ResetGyroHeading() {
   m_gyro.Reset();

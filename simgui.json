@@ -19,6 +19,13 @@
       "/LiveWindow/Ungrouped/class frc2::SubsystemBase": "Subsystem",
       "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
       "/SmartDashboard/field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/field": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
