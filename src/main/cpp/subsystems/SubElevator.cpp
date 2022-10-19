@@ -95,22 +95,9 @@ bool SubElevator::AtLowerLimit() { return !_Lowerlmt.Get(); }
 bool SubElevator::AtUpperLimit() { return !_Upperlmt.Get(); }
 
 bool SubElevator::GoingDown() {
-  if (_inSmartMotionMode) {
-    return _spmLeftElevator.GetPosition() > _targetPosition ||
-           _spmLeftElevator.GetPosition() > _targetPosition;
-  } else {
-    return _spmRightElevator.Get() < 0 || _spmRightElevator.Get() < 0;
-  }
-  
+  return _spmLeftElevator.GetVelocity() < -0.001; // A little bit past zero to give it some wiggle room
 }
 
 bool SubElevator::GoingUp() {
-  if (_inSmartMotionMode) {
-    return _spmLeftElevator.GetPosition() < _targetPosition ||
-           _spmRightElevator.GetPosition() < _targetPosition;
-  } else {
-    return _spmRightElevator.Get() > 0 || _spmRightElevator.Get() > 0;
-  }
-  
+  return _spmLeftElevator.GetVelocity() > 0.001;  
 }
-
