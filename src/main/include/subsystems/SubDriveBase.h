@@ -19,7 +19,7 @@
 
 class SubDriveBase : public frc2::SubsystemBase {
  public:
-  SubDriveBase();
+  void Periodic() override;
 
   static SubDriveBase &GetInstance() {static SubDriveBase inst; return inst;}
 
@@ -30,21 +30,20 @@ class SubDriveBase : public frc2::SubsystemBase {
   void UpdateOdometry();
   void SyncSensors();
   frc::Rotation2d GetHeading();
+  units::meters_per_second_t GetVelocity();
 
-  static constexpr units::meters_per_second_t kMaxSpeed =
-      3_mps;  // 3 meters per second
-  static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::numbers::pi};
+  static constexpr units::meters_per_second_t MAX_VELOCITY = 3_mps;
+  static constexpr units::radians_per_second_t MAX_ANGULAR_VELOCITY =
+      180_deg_per_s;
 
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
-  void Periodic() override;
   void ResetGyroHeading();
 
  private:
+  SubDriveBase();
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
+  AHRS m_gyro{frc::SerialPort::kMXP};
+
   frc::Translation2d m_frontLeftLocation{+0.281_m, -0.281_m};
   frc::Translation2d m_frontRightLocation{+0.281_m, +0.281_m};
   frc::Translation2d m_backLeftLocation{-0.281_m, -0.281_m};
@@ -60,10 +59,6 @@ class SubDriveBase : public frc2::SubsystemBase {
   SwerveModule m_backLeft{canid::tfxDriveBaseBackLeftDrive, canid::tfxDriveBaseBackLeftTurn, canid::tfxDriveBaseBackLeftEncoder, BACK_LEFT_MAG_OFFSET};
   SwerveModule m_backRight{canid::tfxDriveBaseBackRightDrive, canid::tfxDriveBaseBackRightTurn, canid::tfxDriveBaseBackRightEncoder, BACK_RIGHT_MAG_OFFSET};
 
-   
-
-  AHRS m_gyro{frc::SerialPort::kMXP};
-
   frc::SwerveDriveKinematics<4> m_kinematics{
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
@@ -74,6 +69,7 @@ class SubDriveBase : public frc2::SubsystemBase {
       frc::Rotation2d(), frc::Pose2d(), m_kinematics, 
       {0.0,0.0,0.0}, {0.00}, {0.0,0.0,0.0} 
   };
+  frc::Pose2d _prevPose; // Used for velocity calculations
 
   frc::Field2d _fieldDisplay;
 };
