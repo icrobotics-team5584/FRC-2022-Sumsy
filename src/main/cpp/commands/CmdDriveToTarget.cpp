@@ -9,6 +9,7 @@
 
 CmdDriveToTarget::CmdDriveToTarget() {
   // Use addRequirements() here to declare subsystem dependencies.
+  AddRequirements(&SubDriveBase::GetInstance());
 }
 
 // Called when the command is initially scheduled.
@@ -17,7 +18,7 @@ void CmdDriveToTarget::Initialize() {}
 // Called repeatedly when this Command is scheduled to run
 void CmdDriveToTarget::Execute() {
   auto distance = SubPhotonVision::GetInstance().GetX();
-  SubDriveBase::GetInstance().DriveToTarget(distance, 0_m, 0.2_m);
+  SubDriveBase::GetInstance().DriveToTarget(distance, 0_m, 0.5_m);
 }
 
 // Called once the command ends or is interrupted.
