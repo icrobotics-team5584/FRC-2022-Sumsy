@@ -8,6 +8,7 @@
 #include "commands/CmdResetRotation.h"
 #include "subsystems/SubDriveBase.h"
 #include "commands/CmdDriveRobot.h"
+#include "units/angular_velocity.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -24,6 +25,9 @@ void RobotContainer::ConfigureButtonBindings() {
   Btn{&_controller, BtnId::kRightBumper}.WhileHeld(CmdDeployPickup{});
   Btn{&_controller, BtnId::kLeftBumper}.WhileHeld(CmdPayloadOutake{});
   Btn{&_controller, BtnId::kStart}.WhenPressed(CmdResetRotation{});
+  Btn{&_controller, BtnId::kB}.WhileHeld([&] {
+    SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
+  }, {&SubDriveBase::GetInstance()});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
