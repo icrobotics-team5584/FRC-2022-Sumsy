@@ -18,7 +18,6 @@ void SubDriveBase::Periodic() {
   frc::SmartDashboard::PutNumber("gyro", m_gyro.GetAngle());
   frc::SmartDashboard::PutBoolean("gyro is callibrating", m_gyro.IsCalibrating());
   frc::SmartDashboard::PutNumber("Drivebase speed", GetVelocity().value());
-
   UpdateOdometry();
 }
 
