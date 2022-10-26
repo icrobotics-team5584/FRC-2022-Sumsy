@@ -14,6 +14,7 @@
 #include <wpi/numbers>
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/Field2d.h>
+#include <frc/controller/HolonomicDriveController.h>
 
 #include "Constants.h"
 #include "utilities/SwerveModule.h"
@@ -33,6 +34,8 @@ class SubDriveBase : public frc2::SubsystemBase {
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
              bool fieldRelative);
+
+  void DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t vel, frc::Rotation2d& rot);
              
   void UpdateOdometry();
   void SyncSensors();
@@ -41,6 +44,9 @@ class SubDriveBase : public frc2::SubsystemBase {
   static constexpr units::meters_per_second_t kMaxSpeed =
       3_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
+      wpi::numbers::pi};
+
+  static constexpr units::radians_per_second_squared_t kMaxAngularAcc{
       wpi::numbers::pi};
 
   /**
@@ -78,6 +84,10 @@ class SubDriveBase : public frc2::SubsystemBase {
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, m_gyro.GetRotation2d()};
 
   frc::PIDController Xcontroller{0.1,0,0};
+  frc::PIDController Ycontroller{0.1,0,0};
+  frc::ProfiledPIDController<units::radian> Rcontroller{0.1,0,0,{kMaxAngularSpeed, kMaxAngularAcc}};
+  frc::HolonomicDriveController _driveController{Xcontroller, Ycontroller, Rcontroller};
+
   frc::SwerveDrivePoseEstimator<4> _poseEstimator{
       frc::Rotation2d(), frc::Pose2d(), m_kinematics, 
       {0.0,0.0,0.0}, {0.00}, {0.0,0.0,0.0} 
