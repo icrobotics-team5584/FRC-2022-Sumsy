@@ -8,6 +8,7 @@
 #include <frc/XboxController.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <frc2/command/InstantCommand.h>
+#include "Utilities/JoystickScaler.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -27,7 +28,7 @@ class RobotContainer {
  private:
   // The robot's subsystems and commands are defined here...
   void ConfigureButtonBindings();
-  frc::XboxController _controller {0};
+  JoystickScaler _controller {0, 2.0, 2.0};
   frc2::JoystickButton _rightBumber {&_controller, frc::XboxController::Button::kRightBumper};
   frc2::JoystickButton _leftBumber {&_controller, frc::XboxController::Button::kLeftBumper};
   frc2::JoystickButton _start {&_controller, frc::XboxController::Button::kStart};
