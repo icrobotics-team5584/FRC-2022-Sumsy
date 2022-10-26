@@ -17,8 +17,9 @@ void CmdDriveToTarget::Initialize() {}
 
 // Called repeatedly when this Command is scheduled to run
 void CmdDriveToTarget::Execute() {
-  auto distance = SubPhotonVision::GetInstance().GetX();
-  SubDriveBase::GetInstance().DriveToTarget(distance, 0_m, 0.5_m);
+  auto distanceX = SubPhotonVision::GetInstance().GetX();
+  auto distanceY = SubPhotonVision::GetInstance().GetY();
+  SubDriveBase::GetInstance().DriveToTarget(distanceX, distanceY, 0.5_m);
 }
 
 // Called once the command ends or is interrupted.

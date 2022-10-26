@@ -29,3 +29,13 @@ units::meter_t SubPhotonVision::GetX() {
       return 0_m;
     }
 }
+units::meter_t SubPhotonVision::GetY() {
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+  
+    if (result.HasTargets()) {
+      auto bestTarget = result.GetBestTarget();
+      return bestTarget.GetCameraToTarget().Y();
+    } else {
+      return 0_m;
+    }
+}
