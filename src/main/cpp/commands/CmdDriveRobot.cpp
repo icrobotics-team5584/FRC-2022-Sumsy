@@ -16,7 +16,7 @@ void CmdDriveRobot::Initialize() {}
 
 // Called repeatedly when this Command is scheduled to run
 void CmdDriveRobot::Execute() {
-  const double deadband = 0.1;
+  const double deadband = 0.17;
 
   // Get the x speed. We are inverting this because Xbox controllers return
   // negative values when we push forward.
