@@ -94,7 +94,9 @@ void SwerveModule::SetDesiredVelocity(units::meters_per_second_t velocity) {
   const double metersPer100MS = metersPerMS * 100;
   const double revolutionsPer100MS = metersPer100MS / WHEEL_RADIUS.value();
   const double ticsPer100MS = revolutionsPer100MS * TICS_PER_MOTOR_REVOLUTION;
-  _canDriveMotor.Set(TalonFXControlMode::Velocity, ticsPer100MS);
+  units::volt_t ffvolts = _feedFoward.Calculate(velocity);
+  double ffpercent = ffvolts.value()/12;
+  _canDriveMotor.Set(TalonFXControlMode::Velocity, ticsPer100MS, DemandType::DemandType_ArbitraryFeedForward, ffpercent);
 }
 
 void SwerveModule::StopMotors() {

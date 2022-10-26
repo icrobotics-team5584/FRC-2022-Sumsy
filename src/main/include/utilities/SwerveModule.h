@@ -15,10 +15,9 @@
 #include <units/velocity.h>
 #include <units/voltage.h>
 #include <frc/geometry/Rotation2d.h>
-
 #include <memory>
 #include <wpi/numbers>
-
+#include <frc/controller/SimpleMotorFeedforward.h>
 #include "utilities/FalconFactory.h"
 
 class SwerveModule {
@@ -51,12 +50,13 @@ class SwerveModule {
   const double TURN_P = 0.2;
   const double TURN_I = 0.0;
   const double TURN_D = 0.1;
-  const double DRIVE_P = 0.1;
+  const double DRIVE_P = 0.011489;
   const double DRIVE_I = 0.0;
   const double DRIVE_D = 0.0;
-  const double DRIVE_F = 0.1;
+  const double DRIVE_F = 0;
   const int PID_SLOT_INDEX = 0;
 
+  frc::SimpleMotorFeedforward<units::meters> _feedFoward{0.62004_V, 2.2731_V/1_mps, 0.23244_V/1_mps_sq};
   TalonFX _canDriveMotor;
   TalonFX _canTurnMotor;
   CANCoder _canTurnEncoder;
