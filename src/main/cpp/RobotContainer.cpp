@@ -8,8 +8,10 @@
 #include "commands/CmdResetRotation.h"
 #include "subsystems/SubDriveBase.h"
 #include "commands/CmdDriveRobot.h"
+#include "commands/CmdPrintPath.h"
 #include "subsystems/SubPhotonVision.h"
 #include "commands/CmdDriveToTarget.h"
+#include "commands/CmdAutoDrivePath.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -27,10 +29,11 @@ void RobotContainer::ConfigureButtonBindings() {
   Btn{&_controller, BtnId::kRightBumper}.WhileHeld(CmdDeployPickup{});
   Btn{&_controller, BtnId::kLeftBumper}.WhileHeld(CmdPayloadOutake{});
   Btn{&_controller, BtnId::kStart}.WhenPressed(CmdResetRotation{});
+  Btn{&_controller, BtnId::kBack}.WhileHeld(CmdAutoDrivePath{});
   Btn{&_controller, BtnId::kA}.WhileHeld(CmdDriveToTarget{});
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
+frc2::Command* RobotContainer::GetAutonomousCommand() {\
   // An example command will be run in git autonomous
   return nullptr;
 }

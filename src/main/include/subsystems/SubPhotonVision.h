@@ -14,6 +14,7 @@ public:
   }
 
   units::meter_t GetX();
+  units::meter_t GetY();
 
   void Periodic() override;
 
