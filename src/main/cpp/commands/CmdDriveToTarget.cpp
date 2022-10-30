@@ -8,7 +8,7 @@
 #include <units/length.h>
 
 CmdDriveToTarget::CmdDriveToTarget() {
-  // Use addRequirements() here to declare subsystem dependencies.
+  AddRequirements(&SubDriveBase::GetInstance());
 }
 
 // Called when the command is initially scheduled.

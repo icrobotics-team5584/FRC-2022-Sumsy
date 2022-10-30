@@ -9,6 +9,7 @@
 
 SubDriveBase::SubDriveBase(){
   m_gyro.Calibrate();
+  frc::SmartDashboard::PutData("Xcontroller", &Xcontroller);
   frc::SmartDashboard::PutData("field", &_fieldDisplay);
 }
 
