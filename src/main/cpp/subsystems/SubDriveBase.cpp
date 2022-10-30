@@ -105,3 +105,9 @@ void SubDriveBase::DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t
 void SubDriveBase::ResetGyroHeading() {
   m_gyro.Reset();
 }
+
+frc::Pose2d SubDriveBase::GetPose() {return _poseEstimator.GetEstimatedPosition();}
+
+void SubDriveBase::DisplayPose(std::string label, frc::Pose2d pose){
+  _fieldDisplay.GetObject(label)->SetPose(pose);
+}

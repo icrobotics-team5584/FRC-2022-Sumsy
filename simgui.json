@@ -18,7 +18,10 @@
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/class frc2::SubsystemBase": "Subsystem",
       "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
-      "/SmartDashboard/field": "Field2d"
+      "/SmartDashboard/Xcontroller": "PIDController",
+      "/SmartDashboard/field": "Field2d",
+      "/SmartDashboard/x controller": "PIDController",
+      "/SmartDashboard/y controller": "PIDController"
     },
     "windows": {
       "/SmartDashboard/field": {
@@ -42,14 +45,11 @@
       "open": true
     }
   },
-  "NetworkTables View": {
-    "visible": false
-  },
   "Plot": {
     "Plot <0>": {
       "plots": [
         {
-          "height": 335,
+          "height": 465,
           "series": [
             {
               "color": [
@@ -89,7 +89,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

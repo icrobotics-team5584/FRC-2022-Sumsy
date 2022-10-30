@@ -1,8 +1,13 @@
 #include "subsystems/SubPhotonVision.h"
 #include <photonlib/PhotonUtils.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include "subsystems/SubDriveBase.h"
 
-SubPhotonVision::SubPhotonVision() = default;
+SubPhotonVision::SubPhotonVision(){
+  _simVision.AddSimVisionTarget(_visionTarget1);
+
+  SubDriveBase::GetInstance().DisplayPose("visionTarget", _target1Pose);
+}
 
 // This method will be called once per scheduler run
 void SubPhotonVision::Periodic() {
@@ -38,4 +43,8 @@ units::meter_t SubPhotonVision::GetY() {
     } else {
       return 0_m;
     }
+}
+
+void SubPhotonVision::SimulationPeriodic() {
+  _simVision.ProcessFrame(SubDriveBase::GetInstance().GetPose());
 }
