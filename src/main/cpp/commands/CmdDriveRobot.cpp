@@ -16,26 +16,26 @@ void CmdDriveRobot::Initialize() {}
 
 // Called repeatedly when this Command is scheduled to run
 void CmdDriveRobot::Execute() {
-  const double deadband = 0.1;
+  const double deadband = 0.17;
 
   // Get the x speed. We are inverting this because Xbox controllers return
   // negative values when we push forward.
   const auto xSpeed = -m_xspeedLimiter.Calculate(
                           frc::ApplyDeadband(_controller -> GetLeftY(), deadband)) *
-                      SubDriveBase::kMaxSpeed;
+                      SubDriveBase::MAX_VELOCITY;
   // Get the y speed or sideways/strafe speed. We are inverting this because
   // we want a positive value when we pull to the left. Xbox controllers
   // return positive values when you pull to the right by default.
   const auto ySpeed = m_yspeedLimiter.Calculate(
                           frc::ApplyDeadband(_controller -> GetLeftX(), deadband)) *
-                      SubDriveBase::kMaxSpeed;
+                      SubDriveBase::MAX_VELOCITY;
   // Get the rate of angular rotation. We are inverting this because we want a
   // positive value when we pull to the left (remember, CCW is positive in
   // mathematics). Xbox controllers return positive values when you pull to
   // the right by default.
   const auto rot = m_rotLimiter.Calculate(
                        frc::ApplyDeadband(_controller -> GetRightX(), deadband)) *
-                   SubDriveBase::kMaxAngularSpeed;
+                   SubDriveBase::MAX_ANGULAR_VELOCITY;
   SubDriveBase::GetInstance().Drive(xSpeed, ySpeed, rot, true);
 }
 
