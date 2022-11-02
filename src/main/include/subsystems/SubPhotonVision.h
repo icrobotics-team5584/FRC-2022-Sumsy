@@ -17,6 +17,8 @@ public:
 
   units::meter_t GetX();
   units::meter_t GetY();
+  units::degree_t GetRot();
+
 
   void Periodic() override;
   void SimulationPeriodic() override;

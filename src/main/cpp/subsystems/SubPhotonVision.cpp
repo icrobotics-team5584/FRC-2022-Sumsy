@@ -2,6 +2,7 @@
 #include <photonlib/PhotonUtils.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "subsystems/SubDriveBase.h"
+#include "units/angle.h"
 
 SubPhotonVision::SubPhotonVision(){
   _simVision.AddSimVisionTarget(_visionTarget1);
@@ -42,6 +43,16 @@ units::meter_t SubPhotonVision::GetY() {
       return bestTarget.GetCameraToTarget().Y();
     } else {
       return 0_m;
+    }
+}
+units::degree_t SubPhotonVision::GetRot() {
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+  
+    if (result.HasTargets()) {
+      auto bestTarget = result.GetBestTarget();
+      return bestTarget.GetCameraToTarget().Rotation().Z();
+    } else {
+      return 0_deg;
     }
 }
 

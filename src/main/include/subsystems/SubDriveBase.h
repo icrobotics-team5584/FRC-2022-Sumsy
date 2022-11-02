@@ -29,7 +29,7 @@ class SubDriveBase : public frc2::SubsystemBase {
     return inst;
   }
   void UpdatePidControllerDrive();
-  void DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance);
+  void DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance, units::degree_t targetRotation);
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,

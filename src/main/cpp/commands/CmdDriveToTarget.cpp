@@ -18,7 +18,8 @@ void CmdDriveToTarget::Initialize() {}
 void CmdDriveToTarget::Execute() {
   auto distanceX = SubPhotonVision::GetInstance().GetX();
   auto distanceY = SubPhotonVision::GetInstance().GetY();
-  SubDriveBase::GetInstance().DriveToTarget(distanceX, distanceY, 0.5_m);
+  auto rotationToTarget = SubPhotonVision::GetInstance().GetY();
+  SubDriveBase::GetInstance().DriveToTarget(distanceX, distanceY, 0.5_m, rotationToTarget);
 }
 
 // Called once the command ends or is interrupted.
