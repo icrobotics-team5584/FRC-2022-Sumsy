@@ -88,7 +88,7 @@ class SubDriveBase : public frc2::SubsystemBase {
 
   frc::PIDController Xcontroller{0.1,0,0};
   frc::PIDController Ycontroller{0.1,0,0};
-  frc::ProfiledPIDController<units::radian> Rcontroller{0.1,0,0,{kMaxAngularSpeed, kMaxAngularAcc}};
+  frc::ProfiledPIDController<units::radian> Rcontroller{1.8,0,0,{kMaxAngularSpeed, kMaxAngularAcc}};
   frc::HolonomicDriveController _driveController{Xcontroller, Ycontroller, Rcontroller};
 
   frc::SwerveDrivePoseEstimator<4> _poseEstimator{

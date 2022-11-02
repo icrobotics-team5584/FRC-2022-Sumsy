@@ -18,7 +18,7 @@ void CmdDriveToTarget::Initialize() {}
 void CmdDriveToTarget::Execute() {
   auto distanceX = SubPhotonVision::GetInstance().GetX();
   auto distanceY = SubPhotonVision::GetInstance().GetY();
-  auto rotationToTarget = SubPhotonVision::GetInstance().GetY();
+  auto rotationToTarget = SubPhotonVision::GetInstance().GetRot();
   SubDriveBase::GetInstance().DriveToTarget(distanceX, distanceY, 0.5_m, rotationToTarget);
 }
 

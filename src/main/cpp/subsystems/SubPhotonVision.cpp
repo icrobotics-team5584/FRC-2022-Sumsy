@@ -22,6 +22,7 @@ void SubPhotonVision::Periodic() {
       frc::SmartDashboard::PutNumber("target Rot",
                                      botToTarg.Rotation().Z().value());
       frc::SmartDashboard::PutNumber("target Y", botToTarg.Y().value());
+      frc::SmartDashboard::PutNumber("Rotation", GetRot().value());
     }
 }
 
@@ -50,7 +51,10 @@ units::degree_t SubPhotonVision::GetRot() {
   
     if (result.HasTargets()) {
       auto bestTarget = result.GetBestTarget();
-      return bestTarget.GetCameraToTarget().Rotation().Z();
+      double yaw = bestTarget.GetYaw();
+      units::degree_t rotation {yaw};
+      return rotation;
+      
     } else {
       return 0_deg;
     }

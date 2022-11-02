@@ -13,6 +13,7 @@ SubDriveBase::SubDriveBase(){
   frc::SmartDashboard::PutData("field", &_fieldDisplay);
   frc::SmartDashboard::PutData("x controller", &Xcontroller);
   frc::SmartDashboard::PutData("y controller", &Ycontroller);
+  frc::SmartDashboard::PutData("rotation controller", &Rcontroller);
 }
 
 // This method will be called once per scheduler run
@@ -62,14 +63,15 @@ frc::Rotation2d SubDriveBase::GetHeading() {
   return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
 }
 
-void SubDriveBase::DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance) {
+void SubDriveBase::DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance, units::degree_t targetRotation) {
    double speedX = -Xcontroller.Calculate(xDistance.value(), targetDistance.value());
    double speedY = Ycontroller.Calculate(yDistance.value(), 0);
+   double speedRot = -Rcontroller.Calculate(targetRotation, 0_deg);
    speedX = std::clamp(speedX, -0.5, 0.5);
    speedY = std::clamp(speedY, -0.5, 0.5);
-   Drive(speedX*1_mps, speedY*1_mps, 0_rad_per_s, false);
+   speedRot = std::clamp(speedRot, -2.0, 2.0);
+   Drive(speedX*1_mps, speedY*1_mps, speedRot*1_rad_per_s, false);
 }
-
 //void SubDriveBase::SetTargetRpm(double rpm){
    // _controller.SetSetpoint(rpm);
 //}
