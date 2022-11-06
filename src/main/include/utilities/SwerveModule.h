@@ -18,7 +18,6 @@
 #include <memory>
 #include <wpi/numbers>
 #include <frc/controller/SimpleMotorFeedforward.h>
-#include "utilities/FalconFactory.h"
 
 class SwerveModule {
  public:
