@@ -6,6 +6,7 @@
 #include "subsystems/SubDriveBase.h"
 #include <frc/MathUtil.h>
 #include <frc/RobotBase.h>
+#include <units/time.h>
 
 SubDriveBase::SubDriveBase(){
   m_gyro.Calibrate();
@@ -109,4 +110,8 @@ frc::Pose2d SubDriveBase::GetPose() {return _poseEstimator.GetEstimatedPosition(
 
 void SubDriveBase::DisplayPose(std::string label, frc::Pose2d pose){
   _fieldDisplay.GetObject(label)->SetPose(pose);
+}
+
+void SubDriveBase::UpdatePosition(frc::Pose2d robotPosition) {
+  _poseEstimator.AddVisionMeasurement(robotPosition, 2_ms);
 }

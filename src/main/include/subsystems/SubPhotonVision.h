@@ -18,6 +18,7 @@ public:
   units::meter_t GetX();
   units::meter_t GetY();
   units::degree_t GetRot();
+  std::optional <frc::Transform3d> GetBotToTarg();
 
 
   void Periodic() override;

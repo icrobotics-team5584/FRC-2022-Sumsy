@@ -13,11 +13,12 @@
 #include "commands/CmdDriveToTarget.h"
 #include "commands/CmdAutoDrivePath.h"
 #include "units/angular_velocity.h"
+#include "commands/CmdUpdatePosition.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
   SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
-  SubPhotonVision::GetInstance();
+  SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition);
   // Configure the button bindings
   ConfigureButtonBindings();
 }

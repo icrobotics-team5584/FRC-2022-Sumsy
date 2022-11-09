@@ -60,6 +60,17 @@ units::degree_t SubPhotonVision::GetRot() {
     }
 }
 
+std::optional<frc::Transform3d> SubPhotonVision::GetBotToTarg() {
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+
+  if (result.HasTargets()) {
+    auto bestTarget = result.GetBestTarget();
+    return bestTarget.GetCameraToTarget();
+  } else {
+    return {};
+  }
+}
+
 void SubPhotonVision::SimulationPeriodic() {
   _simVision.ProcessFrame(SubDriveBase::GetInstance().GetPose());
 }

@@ -52,6 +52,7 @@ class SubDriveBase : public frc2::SubsystemBase {
       wpi::numbers::pi};
 
   void ResetGyroHeading();
+  void UpdatePosition(frc::Pose2d robotPosition);
 
  private:
   SubDriveBase();
