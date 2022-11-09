@@ -31,6 +31,11 @@ namespace canid {
   constexpr int tfxDriveBaseBackRightTurn = 6;
   constexpr int tfxDriveBaseBackRightEncoder = 12;
 
+  constexpr int spmDriveBaseFrontRight = 3;
+  constexpr int spmDriveBaseBackRight = 1;
+  constexpr int spmDriveBaseFrontLeft = 4;
+  constexpr int spmDriveBaseBackLeft = 2;
+
   constexpr int tfxIntake = 14;
   constexpr int spmPayload = 99;
   constexpr int spmPayloadFollow = 98;
