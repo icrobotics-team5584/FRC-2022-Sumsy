@@ -31,4 +31,6 @@ class SubTankDrive : public frc2::SubsystemBase {
   rev::CANSparkMax _spmBackRight{canid::spmDriveBaseBackRight, rev::CANSparkMax::MotorType::kBrushless};
   //rev::CANSparkMax _spmDolly{canid::spmDolly, rev::CANSparkMax::MotorType::kBrushless};
   frc::DifferentialDrive _diffDrive{_spmFrontLeft, _spmFrontRight};
+
+  unsigned int _currentLimit = 50;
 };
