@@ -9,6 +9,7 @@
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/XboxController.h>
 #include <units/dimensionless.h>
+#include <units/voltage.h>
 
 /**
  * An example command.
@@ -30,4 +31,8 @@ class CmdDriveRobotTank
 
   bool IsFinished() override;
   frc::XboxController* _controller;
+
+  private:
+  frc::SlewRateLimiter<units::volts> _stickYLimiter{2_V / 1_s};
+
 };

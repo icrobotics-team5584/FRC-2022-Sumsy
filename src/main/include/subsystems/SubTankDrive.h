@@ -11,7 +11,7 @@
 
 class SubTankDrive : public frc2::SubsystemBase {
  public:
-  SubTankDrive();
+  static SubTankDrive &GetInstance() {static SubTankDrive inst; return inst;}
 
   void drive(double speed, double rotation, bool squaredInputs = false);
 
@@ -23,6 +23,7 @@ class SubTankDrive : public frc2::SubsystemBase {
   void SetBreakMode();
 
  private:
+ SubTankDrive();
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
   rev::CANSparkMax _spmFrontLeft{canid::spmDriveBaseFrontLeft, rev::CANSparkMax::MotorType::kBrushless};

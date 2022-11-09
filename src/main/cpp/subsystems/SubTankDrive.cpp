@@ -26,6 +26,10 @@ SubTankDrive::SubTankDrive() {
   SetBreakMode();
 }
 
+void SubTankDrive::drive(double speed, double rotation, bool squaredInputs){
+  _diffDrive.ArcadeDrive(speed, rotation, squaredInputs);
+}
+
 // This method will be called once per scheduler run
 void SubTankDrive::Periodic() {}
 
