@@ -31,6 +31,7 @@ namespace canid {
   constexpr int tfxDriveBaseBackRightTurn = 6;
   constexpr int tfxDriveBaseBackRightEncoder = 12;
 
+  //For tank drive
   constexpr int spmDriveBaseFrontRight = 3;
   constexpr int spmDriveBaseBackRight = 1;
   constexpr int spmDriveBaseFrontLeft = 4;
