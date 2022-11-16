@@ -9,12 +9,15 @@
 #include "subsystems/SubDriveBase.h"
 #include "commands/CmdDriveRobot.h"
 #include "units/angular_velocity.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
   SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
   // Configure the button bindings
   ConfigureButtonBindings();
+
+  frc::SmartDashboard::PutBoolean("SwerveDrive Enabled", true);
 }
 
 void RobotContainer::ConfigureButtonBindings() {
