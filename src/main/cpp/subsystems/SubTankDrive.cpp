@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/SubTankDrive.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 SubTankDrive::SubTankDrive() {
     // Reset all the motor controllers to factory default
@@ -24,6 +25,12 @@ SubTankDrive::SubTankDrive() {
   _spmFrontRight.SetInverted(true);
 
   SetBreakMode();
+
+  frc::SmartDashboard::PutData("FrontLeftMotor", (wpi::Sendable*)&_spmFrontLeft);
+  frc::SmartDashboard::PutData("FrontRightMotor", (wpi::Sendable*)&_spmFrontRight);
+  frc::SmartDashboard::PutData("BackLeftMotor", (wpi::Sendable*)&_spmBackLeft);
+  frc::SmartDashboard::PutData("BackRightMotor", (wpi::Sendable*)&_spmBackRight);
+  
 }
 
 void SubTankDrive::drive(double speed, double rotation, bool squaredInputs){

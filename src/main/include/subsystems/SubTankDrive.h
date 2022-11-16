@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include <rev/CANSparkMax.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
+#include "utilities/ICSparkMax.h"
 
 class SubTankDrive : public frc2::SubsystemBase {
  public:
@@ -26,10 +26,10 @@ class SubTankDrive : public frc2::SubsystemBase {
  SubTankDrive();
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-  rev::CANSparkMax _spmFrontLeft{canid::spmDriveBaseFrontLeft, rev::CANSparkMax::MotorType::kBrushless};
-  rev::CANSparkMax _spmFrontRight{canid::spmDriveBaseFrontRight, rev::CANSparkMax::MotorType::kBrushless};
-  rev::CANSparkMax _spmBackLeft{canid::spmDriveBaseBackLeft, rev::CANSparkMax::MotorType::kBrushless};
-  rev::CANSparkMax _spmBackRight{canid::spmDriveBaseBackRight, rev::CANSparkMax::MotorType::kBrushless};
+  ICSparkMax _spmFrontLeft{canid::spmDriveBaseFrontLeft};
+  ICSparkMax _spmFrontRight{canid::spmDriveBaseFrontRight};
+  ICSparkMax _spmBackLeft{canid::spmDriveBaseBackLeft};
+  ICSparkMax _spmBackRight{canid::spmDriveBaseBackRight};
   //rev::CANSparkMax _spmDolly{canid::spmDolly, rev::CANSparkMax::MotorType::kBrushless};
   frc::DifferentialDrive _diffDrive{_spmFrontLeft, _spmFrontRight};
 
