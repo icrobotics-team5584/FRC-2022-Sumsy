@@ -18,8 +18,8 @@ void CmdDriveRobotTank::Initialize() {}
 // Called repeatedly when this Command is scheduled to run
 void CmdDriveRobotTank::Execute() {
   double speed = _controller -> GetLeftY();
-  double turning
-   = _controller -> GetLeftX();
+  double turning = _controller -> GetLeftX();
+  turning = turning * -1;
   double speedLimited = _stickYLimiter.Calculate(units::volt_t(speed)).value();
 
   SubTankDrive::GetInstance().drive(speedLimited, turning, false);
