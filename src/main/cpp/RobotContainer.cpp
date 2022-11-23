@@ -8,12 +8,18 @@
 #include "commands/CmdResetRotation.h"
 #include "subsystems/SubDriveBase.h"
 #include "commands/CmdDriveRobot.h"
+#include "commands/CmdPrintPath.h"
+#include "subsystems/SubPhotonVision.h"
+#include "commands/CmdDriveToTarget.h"
+#include "commands/CmdAutoDrivePath.h"
 #include "units/angular_velocity.h"
 #include <frc/smartdashboard/SmartDashboard.h>
+#include "commands/CmdUpdatePosition.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
   SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
+  SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition());
   // Configure the button bindings
   ConfigureButtonBindings();
 
@@ -28,13 +34,15 @@ void RobotContainer::ConfigureButtonBindings() {
   Btn{&_controller, BtnId::kRightBumper}.WhileHeld(CmdDeployPickup{});
   Btn{&_controller, BtnId::kLeftBumper}.WhileHeld(CmdPayloadOutake{});
   Btn{&_controller, BtnId::kStart}.WhenPressed(CmdResetRotation{});
+  Btn{&_controller, BtnId::kBack}.WhileHeld(CmdAutoDrivePath{});
+  Btn{&_controller, BtnId::kA}.WhileHeld(CmdDriveToTarget{});
   Btn{&_controller, BtnId::kB}.WhileHeld([&] {
     SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
   }, {&SubDriveBase::GetInstance()});
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {
-  // An example command will be run in autonomous
+frc2::Command* RobotContainer::GetAutonomousCommand() {\
+  // An example command will be run in git autonomous
   return nullptr;
 }
 

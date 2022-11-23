@@ -12,7 +12,9 @@
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <wpi/numbers>
+#include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/Field2d.h>
+#include <frc/controller/HolonomicDriveController.h>
 
 #include "Constants.h"
 #include "utilities/SwerveModule.h"
@@ -21,11 +23,21 @@ class SubDriveBase : public frc2::SubsystemBase {
  public:
   void Periodic() override;
 
-  static SubDriveBase &GetInstance() {static SubDriveBase inst; return inst;}
+  static SubDriveBase& GetInstance() {
+    static SubDriveBase inst;
+    return inst;
+  }
+  void UpdatePidControllerDrive();
+  void DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance, units::degree_t targetRotation);
 
   void Drive(units::meters_per_second_t xSpeed,
              units::meters_per_second_t ySpeed, units::radians_per_second_t rot,
              bool fieldRelative);
+
+  void DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t vel, frc::Rotation2d& rot);
+
+  frc::Pose2d GetPose();
+  void DisplayPose(std::string label, frc::Pose2d pose);
              
   void UpdateOdometry();
   void SyncSensors();
@@ -36,7 +48,11 @@ class SubDriveBase : public frc2::SubsystemBase {
   static constexpr units::radians_per_second_t MAX_ANGULAR_VELOCITY =
       180_deg_per_s;
 
+  static constexpr units::radians_per_second_squared_t MAX_ANGULAR_ACCEL{
+      wpi::numbers::pi};
+
   void ResetGyroHeading();
+  void UpdatePosition(frc::Pose2d robotPosition);
 
  private:
   SubDriveBase();
@@ -64,6 +80,11 @@ class SubDriveBase : public frc2::SubsystemBase {
       m_backRightLocation};
 
   frc::SwerveDriveOdometry<4> m_odometry{m_kinematics, m_gyro.GetRotation2d()};
+
+  frc::PIDController Xcontroller{0.1,0,0};
+  frc::PIDController Ycontroller{0.1,0,0};
+  frc::ProfiledPIDController<units::radian> Rcontroller{1.8,0,0,{MAX_ANGULAR_VELOCITY, MAX_ANGULAR_ACCEL}};
+  frc::HolonomicDriveController _driveController{Xcontroller, Ycontroller, Rcontroller};
 
   frc::SwerveDrivePoseEstimator<4> _poseEstimator{
       frc::Rotation2d(), frc::Pose2d(), m_kinematics, 

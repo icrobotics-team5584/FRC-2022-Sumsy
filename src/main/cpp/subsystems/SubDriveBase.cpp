@@ -6,10 +6,15 @@
 #include "subsystems/SubDriveBase.h"
 #include <frc/MathUtil.h>
 #include <frc/RobotBase.h>
+#include <units/time.h>
 
 SubDriveBase::SubDriveBase(){
   m_gyro.Calibrate();
+  frc::SmartDashboard::PutData("Xcontroller", &Xcontroller);
   frc::SmartDashboard::PutData("field", &_fieldDisplay);
+  frc::SmartDashboard::PutData("x controller", &Xcontroller);
+  frc::SmartDashboard::PutData("y controller", &Ycontroller);
+  frc::SmartDashboard::PutData("rotation controller", &Rcontroller);
 }
 
 // This method will be called once per scheduler run
@@ -60,6 +65,16 @@ frc::Rotation2d SubDriveBase::GetHeading() {
   return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
 }
 
+void SubDriveBase::DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance, units::degree_t targetRotation) {
+   double speedX = -Xcontroller.Calculate(xDistance.value(), targetDistance.value());
+   double speedY = Ycontroller.Calculate(yDistance.value(), 0);
+   double speedRot = -Rcontroller.Calculate(targetRotation, 0_deg);
+   speedX = std::clamp(speedX, -0.5, 0.5);
+   speedY = std::clamp(speedY, -0.5, 0.5);
+   speedRot = std::clamp(speedRot, -2.0, 2.0);
+   Drive(speedX*1_mps, speedY*1_mps, speedRot*1_rad_per_s, false);
+}
+
 // Calculate robot's velocity over past time step (20 ms)
 units::meters_per_second_t SubDriveBase::GetVelocity() {
   auto robotDisplacement = _prevPose
@@ -82,6 +97,21 @@ void SubDriveBase::UpdateOdometry() {
   _fieldDisplay.SetRobotPose(_poseEstimator.GetEstimatedPosition());
 }
 
+void SubDriveBase::DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t vel, frc::Rotation2d& rot) {
+  auto driveSpeeds = _driveController.Calculate(_poseEstimator.GetEstimatedPosition(), pos, vel, rot);
+  Drive(driveSpeeds.vx, driveSpeeds.vy, driveSpeeds.omega, true);
+}
+
 void SubDriveBase::ResetGyroHeading() {
   m_gyro.Reset();
+}
+
+frc::Pose2d SubDriveBase::GetPose() {return _poseEstimator.GetEstimatedPosition();}
+
+void SubDriveBase::DisplayPose(std::string label, frc::Pose2d pose){
+  _fieldDisplay.GetObject(label)->SetPose(pose);
+}
+
+void SubDriveBase::UpdatePosition(frc::Pose2d robotPosition) {
+  _poseEstimator.AddVisionMeasurement(robotPosition, 2_ms);
 }
