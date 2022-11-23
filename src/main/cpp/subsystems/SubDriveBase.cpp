@@ -102,6 +102,10 @@ void SubDriveBase::DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t
   Drive(driveSpeeds.vx, driveSpeeds.vy, driveSpeeds.omega, true);
 }
 
+void SubDriveBase::SnapToAngle(int targetAngle){
+  
+}
+
 void SubDriveBase::ResetGyroHeading() {
   m_gyro.Reset();
 }

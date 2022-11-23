@@ -54,6 +54,8 @@ class SubDriveBase : public frc2::SubsystemBase {
   void ResetGyroHeading();
   void UpdatePosition(frc::Pose2d robotPosition);
 
+  void SnapToAngle(int targetAngle);
+
  private:
   SubDriveBase();
   // Components (e.g. motor controllers and sensors) should generally be
