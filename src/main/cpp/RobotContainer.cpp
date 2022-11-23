@@ -15,6 +15,7 @@
 #include "units/angular_velocity.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "commands/CmdUpdatePosition.h"
+#include "subsystems/SubTestElevator.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -39,6 +40,14 @@ void RobotContainer::ConfigureButtonBindings() {
   Btn{&_controller, BtnId::kB}.WhileHeld([&] {
     SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
   }, {&SubDriveBase::GetInstance()});
+  Btn{&_controller, BtnId::kY}.WhenPressed(
+      [] { SubTestElevator::GetInstance().Up();});
+  Btn{&_controller, BtnId::kY}.WhenReleased(
+      [] { SubTestElevator::GetInstance().Stop();});
+  Btn{&_controller, BtnId::kX}.WhenPressed(
+      [] { SubTestElevator::GetInstance().Down();});
+  Btn{&_controller, BtnId::kX}.WhenReleased(
+      [] { SubTestElevator::GetInstance().Stop();});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {\
