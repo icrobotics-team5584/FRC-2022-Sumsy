@@ -15,6 +15,8 @@
 #include "units/angular_velocity.h"
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "commands/CmdUpdatePosition.h"
+#include <frc2/command/button/POVButton.h>
+#include "commands/CmdSnapToAngle.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
@@ -39,9 +41,11 @@ void RobotContainer::ConfigureButtonBindings() {
   Btn{&_controller, BtnId::kB}.WhileHeld([&] {
     SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
   }, {&SubDriveBase::GetInstance()});
+
+  frc2::POVButton{&_controller, 0, 0}.WhenPressed(CmdSnapToAngle{});
 }
 
-frc2::Command* RobotContainer::GetAutonomousCommand() {\
+frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in git autonomous
   return nullptr;
 }
