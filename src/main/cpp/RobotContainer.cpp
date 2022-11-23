@@ -42,7 +42,7 @@ void RobotContainer::ConfigureButtonBindings() {
     SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
   }, {&SubDriveBase::GetInstance()});
 
-  frc2::POVButton{&_controller, 0, 0}.WhenPressed(CmdSnapToAngle{});
+  frc2::POVButton{&_controller, 0, 0}.WhenPressed(CmdSnapToAngle{0});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {

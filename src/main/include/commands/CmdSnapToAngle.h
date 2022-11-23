@@ -17,7 +17,7 @@
 class CmdSnapToAngle
     : public frc2::CommandHelper<frc2::CommandBase, CmdSnapToAngle> {
  public:
-  CmdSnapToAngle();
+  CmdSnapToAngle(int targetAngle);
 
   void Initialize() override;
 
@@ -26,4 +26,7 @@ class CmdSnapToAngle
   void End(bool interrupted) override;
 
   bool IsFinished() override;
+
+  private:
+    int _targetAngle;
 };
