@@ -14,7 +14,6 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID,
   _canTurnEncoder.SetPositionToAbsolute();
   _canTurnEncoder.ConfigAbsoluteSensorRange(AbsoluteSensorRange::Signed_PlusMinus180);
   _canTurnEncoder.ConfigMagnetOffset(cancoderMagOffset);
-  _canTurnEncoder.ConfigSensorDirection(true); // Invert to match rotation of falcon internal sensors
 
   // Config Turning Motor
   _canTurnMotor.ConfigFactoryDefault();
@@ -24,6 +23,7 @@ SwerveModule::SwerveModule(int canDriveMotorID, int canTurnMotorID,
   _canTurnMotor.Config_kI(PID_SLOT_INDEX, TURN_I);
   _canTurnMotor.Config_kD(PID_SLOT_INDEX, TURN_D);
   _canTurnMotor.ConfigSupplyCurrentLimit(CURRENT_LIMIT_CONFIG);
+  _canTurnMotor.SetInverted(true); // make counter clockwise rotations positive
 
   // Config Driving Motor
   _canDriveMotor.ConfigFactoryDefault();
