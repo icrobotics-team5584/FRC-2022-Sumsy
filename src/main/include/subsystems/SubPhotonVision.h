@@ -5,6 +5,7 @@
 #include <units/length.h>
 #include <photonlib/SimVisionSystem.h>
 #include <photonlib/SimVisionTarget.h>
+#include <optional>
 
 class SubPhotonVision : public frc2::SubsystemBase
 {

@@ -67,7 +67,7 @@ frc::Rotation2d SwerveModule::GetAngle() {
   const double rawPos = frc::RobotBase::IsReal()
                             ? _canTurnMotor.GetSelectedSensorPosition()
                             : _canTurnMotor.GetClosedLoopTarget();
-  return Conversions::TicsToRotation2d(rawPos, TICS_PER_TURNING_WHEEL_REVOLUTION);
+  return Conversions::FalconTicsToOutputRotations(rawPos, TURNING_GEAR_RATIO);
 }
 
 units::meters_per_second_t SwerveModule::GetSpeed() {
@@ -75,7 +75,7 @@ units::meters_per_second_t SwerveModule::GetSpeed() {
   const double rawSpeed = frc::RobotBase::IsReal()
                             ? _canDriveMotor.GetSelectedSensorVelocity()
                             : _canDriveMotor.GetClosedLoopTarget();
-  return Conversions::FalconVelToMPS(rawSpeed, WHEEL_RADIUS);
+  return Conversions::FalconVelToRobotVel(rawSpeed, DRIVE_GEAR_RATIO, WHEEL_RADIUS);
 }
 
 frc::SwerveModuleState SwerveModule::GetState() {
@@ -89,14 +89,12 @@ void SwerveModule::SetDesiredAngle(units::degree_t angle) {
 }
 
 void SwerveModule::SetDesiredVelocity(units::meters_per_second_t velocity) {
-  // Must convert from meters per second to encoder tics per 100ms, ouch.
-  const double metersPerMS = velocity.value() / 1000;
-  const double metersPer100MS = metersPerMS * 100;
-  const double revolutionsPer100MS = metersPer100MS / WHEEL_RADIUS.value();
-  const double ticsPer100MS = revolutionsPer100MS * TICS_PER_MOTOR_REVOLUTION;
+  double falconVel = Conversions::RobotVelToFalconVel(
+      velocity, DRIVE_GEAR_RATIO, WHEEL_RADIUS);
   units::volt_t ffvolts = _feedFoward.Calculate(velocity);
   double ffpercent = ffvolts.value()/12;
-  _canDriveMotor.Set(TalonFXControlMode::Velocity, ticsPer100MS, DemandType::DemandType_ArbitraryFeedForward, ffpercent);
+  _canDriveMotor.Set(TalonFXControlMode::Velocity, falconVel,
+                     DemandType::DemandType_ArbitraryFeedForward, ffpercent);
 }
 
 void SwerveModule::StopMotors() {
