@@ -21,7 +21,7 @@
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
   SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
-  SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition());
+  SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition{});
   // Configure the button bindings
   ConfigureButtonBindings();
 
