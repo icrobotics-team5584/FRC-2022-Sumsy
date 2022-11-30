@@ -102,8 +102,10 @@ void SubDriveBase::DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t
   Drive(driveSpeeds.vx, driveSpeeds.vy, driveSpeeds.omega, true);
 }
 
-void SubDriveBase::SnapToAngle(int targetAngle){
-  
+void SubDriveBase::SnapToAngle(units::degree_t targetAngle){ 
+  units::radian_t currentAngle = GetHeading().Radians();
+  double turnSpeed = Rcontroller.Calculate(currentAngle, targetAngle);
+  Drive(0_mps, 0_mps, turnSpeed * 1_rad_per_s, true);
 }
 
 void SubDriveBase::ResetGyroHeading() {

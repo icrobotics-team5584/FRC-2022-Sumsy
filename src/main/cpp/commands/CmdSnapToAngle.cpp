@@ -16,7 +16,7 @@ void CmdSnapToAngle::Initialize() {}
 
 // Called repeatedly when this Command is scheduled to run
 void CmdSnapToAngle::Execute() {
-  
+   SubDriveBase::GetInstance().SnapToAngle(_targetAngle * 1_deg);
 }
 
 // Called once the command ends or is interrupted.

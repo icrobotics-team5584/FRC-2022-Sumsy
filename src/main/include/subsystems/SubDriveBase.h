@@ -54,7 +54,7 @@ class SubDriveBase : public frc2::SubsystemBase {
   void ResetGyroHeading();
   void UpdatePosition(frc::Pose2d robotPosition);
 
-  void SnapToAngle(int targetAngle);
+  void SnapToAngle(units::degree_t targetAngle);
 
  private:
   SubDriveBase();
