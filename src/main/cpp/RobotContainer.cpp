@@ -39,6 +39,9 @@ void RobotContainer::ConfigureButtonBindings() {
   Btn{&_controller, BtnId::kB}.WhileHeld([&] {
     SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
   }, {&SubDriveBase::GetInstance()});
+  Btn{&_controller, BtnId::kX}.WhileHeld([&] {
+    SubDriveBase::GetInstance().DriveToPose({1_m, 1_m, 0_rad});
+  });
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {\

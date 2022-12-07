@@ -36,6 +36,8 @@ class SubDriveBase : public frc2::SubsystemBase {
 
   void DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t vel, frc::Rotation2d& rot);
 
+  void DriveToPose(frc::Pose2d targetPose);
+
   frc::Pose2d GetPose();
   void DisplayPose(std::string label, frc::Pose2d pose);
              
