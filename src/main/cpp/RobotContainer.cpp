@@ -19,7 +19,7 @@
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
   SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
-  SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition());
+  // SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition());
   // Configure the button bindings
   ConfigureButtonBindings();
 
@@ -40,8 +40,8 @@ void RobotContainer::ConfigureButtonBindings() {
     SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
   }, {&SubDriveBase::GetInstance()});
   Btn{&_controller, BtnId::kX}.WhileHeld([&] {
-    SubDriveBase::GetInstance().DriveToPose({1_m, 1_m, 0_rad});
-  });
+    SubDriveBase::GetInstance().DriveToPose({0_m, 0_m, 0_rad});
+  }, {&SubDriveBase::GetInstance()});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {\
