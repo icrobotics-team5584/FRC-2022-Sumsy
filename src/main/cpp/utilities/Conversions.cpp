@@ -9,7 +9,7 @@ units::meters_per_second_t FalconVelToRobotVel(int falconVelocity,
                                                double gearRatio,
                                                units::meter_t wheelRadius) {
   const units::meter_t wheelCircumference = wheelRadius * TAU;
-  const double motorRevsPer100ms = falconVelocity / FALCON_TICS_PER_REVOLUTION;
+  const double motorRevsPer100ms = (double)falconVelocity / (double)FALCON_TICS_PER_REVOLUTION;
   const double shaftRevsPer100ms = motorRevsPer100ms / gearRatio;
   const double shaftRevsPerMS = shaftRevsPer100ms / 100;
   const double shaftRevsPerSecond = shaftRevsPerMS * 1000;
@@ -31,7 +31,7 @@ double RobotVelToFalconVel(units::meters_per_second_t robotVelocity,
 
 frc::Rotation2d FalconTicsToOutputRotations(const int tics,
                                             const double gearRatio) {
-  const double ticsPerOutputRevolution = FALCON_TICS_PER_REVOLUTION * gearRatio;
+  const double ticsPerOutputRevolution = (double)FALCON_TICS_PER_REVOLUTION * gearRatio;
   const units::turn_t outputRevolutions{tics / ticsPerOutputRevolution};
   return units::degree_t{outputRevolutions};
 }
