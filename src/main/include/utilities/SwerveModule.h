@@ -18,7 +18,6 @@
 #include <memory>
 #include <wpi/numbers>
 #include <frc/controller/SimpleMotorFeedforward.h>
-#include "utilities/FalconFactory.h"
 
 class SwerveModule {
  public:
@@ -37,6 +36,7 @@ class SwerveModule {
  private:
   const int TICS_PER_MOTOR_REVOLUTION = 2048;
   const double TURNING_GEAR_RATIO = 150.0/7.0;
+  const double DRIVE_GEAR_RATIO = 6.75; // L2 - Fast kit
   const double TICS_PER_TURNING_WHEEL_REVOLUTION =
       TICS_PER_MOTOR_REVOLUTION * TURNING_GEAR_RATIO;
   const units::meter_t WHEEL_RADIUS = 0.0508_m;

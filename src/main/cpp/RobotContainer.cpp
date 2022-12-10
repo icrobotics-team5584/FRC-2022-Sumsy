@@ -13,6 +13,7 @@
 #include "commands/CmdDriveToTarget.h"
 #include "commands/CmdAutoDrivePath.h"
 #include "units/angular_velocity.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 #include "commands/CmdUpdatePosition.h"
 
 RobotContainer::RobotContainer(){
@@ -21,6 +22,8 @@ RobotContainer::RobotContainer(){
   SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition{});
   // Configure the button bindings
   ConfigureButtonBindings();
+
+  frc::SmartDashboard::PutBoolean("SwerveDrive Enabled", true);
 }
 
 void RobotContainer::ConfigureButtonBindings() {

@@ -60,10 +60,10 @@ class SubDriveBase : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
   AHRS m_gyro{frc::SerialPort::kMXP};
 
-  frc::Translation2d m_frontLeftLocation{+0.281_m, -0.281_m};
-  frc::Translation2d m_frontRightLocation{+0.281_m, +0.281_m};
-  frc::Translation2d m_backLeftLocation{-0.281_m, -0.281_m};
-  frc::Translation2d m_backRightLocation{-0.281_m, +0.281_m};
+  frc::Translation2d m_frontLeftLocation{+0.281_m, +0.281_m};
+  frc::Translation2d m_frontRightLocation{+0.281_m, -0.281_m};
+  frc::Translation2d m_backLeftLocation{-0.281_m, +0.281_m};
+  frc::Translation2d m_backRightLocation{-0.281_m, -0.281_m};
 
   const double FRONT_LEFT_MAG_OFFSET = 16.00;//-13.97;//-166.9;
   const double FRONT_RIGHT_MAG_OFFSET = -136.14;//-111.30;//108.5;

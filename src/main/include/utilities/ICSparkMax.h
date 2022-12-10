@@ -10,6 +10,7 @@
 #include <units/acceleration.h>
 #include <units/length.h>
 #include <units/time.h>
+#include <units/current.h>
 #include <units/velocity.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
@@ -23,17 +24,14 @@
  */
 class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
  public:
-  // Type of motor in use, only used for default current limiting setup
-  enum class Type { NEO, NEO_550 };
-
   /**
    * Create a new object to control a SPARK MAX motor controller, with
    * added convenience features.
    *
    * @param deviceID The device CAN id
-   * @param type Either NEO or NEO_550. Determines default current limiting.
+   * @param currentLimit Value used for spark max smart current limiting
    */
-  ICSparkMax(int deviceID, Type type);
+  ICSparkMax(int deviceID, units::ampere_t currentLimit = 20_A);
 
   /**
    * Sets the closed loop target (aka reference or goal) for the motor to
@@ -235,11 +233,6 @@ class ICSparkMax : public rev::CANSparkMax, wpi::Sendable {
 
  private:
   using Mode = rev::CANSparkMax::ControlType;
-
-  // Default smart Current limiting config
-  Type _type;
-  unsigned const int NEO_CURRENT_LIMIT = 40;
-  unsigned const int NEO_550_CURRENT_LIMIT = 20;
 
   // Related REVLib objects
   rev::SparkMaxPIDController _pidController{CANSparkMax::GetPIDController()};

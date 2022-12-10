@@ -6,7 +6,7 @@
 	},
 	"Make IC Spark Max" : {
 		"prefix" : "ics",
-		"body": "ICSparkMax _$1{canid::$2, ICSparkMax::Type::$3};",
+		"body": "ICSparkMax _$1{canid::$2};",
 		"descrption" : "Construct an IC Spark Max object (Spark max with simulation support and convenience features)"
 	},
 	"Put number to the SmartDashBoard" :{

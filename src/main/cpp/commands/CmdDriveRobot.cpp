@@ -26,14 +26,14 @@ void CmdDriveRobot::Execute() {
   // Get the y speed or sideways/strafe speed. We are inverting this because
   // we want a positive value when we pull to the left. Xbox controllers
   // return positive values when you pull to the right by default.
-  const auto ySpeed = m_yspeedLimiter.Calculate(
+  const auto ySpeed = -m_yspeedLimiter.Calculate(
                           frc::ApplyDeadband(_controller -> GetLeftX(), deadband)) *
                       SubDriveBase::MAX_VELOCITY;
   // Get the rate of angular rotation. We are inverting this because we want a
   // positive value when we pull to the left (remember, CCW is positive in
   // mathematics). Xbox controllers return positive values when you pull to
   // the right by default.
-  const auto rot = m_rotLimiter.Calculate(
+  const auto rot = -m_rotLimiter.Calculate(
                        frc::ApplyDeadband(_controller -> GetRightX(), deadband)) *
                    SubDriveBase::MAX_ANGULAR_VELOCITY;
   SubDriveBase::GetInstance().Drive(xSpeed, ySpeed, rot, true);
