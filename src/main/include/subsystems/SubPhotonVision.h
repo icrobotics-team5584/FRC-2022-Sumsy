@@ -1,12 +1,11 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #pragma once
 
 #include <frc2/command/SubsystemBase.h>
 #include <photonlib/PhotonCamera.h>
 #include <units/length.h>
+#include <photonlib/SimVisionSystem.h>
+#include <photonlib/SimVisionTarget.h>
+#include <optional>
 
 class SubPhotonVision : public frc2::SubsystemBase
 {
@@ -16,28 +15,30 @@ public:
     static SubPhotonVision inst;
     return inst;
   }
-  SubPhotonVision();
 
   units::meter_t GetX();
+  units::meter_t GetY();
+  units::degree_t GetRot();
+  std::optional <frc::Transform3d> GetBotToTarg();
 
-  /**
-   * Will be called periodically whenever the CommandScheduler runs.
-   */
+
   void Periodic() override;
+  void SimulationPeriodic() override;
 
 private:
+  SubPhotonVision();
+  
+  // Camera data
+  photonlib::PhotonCamera camera{"limelight"};
   const units::meter_t CAMERA_HEIGHT = 0.8_m;
-  const units::meter_t TARGET_HEIGHT = 1_m;
-  bool HasTarget = false;
-
-  // Angle between horizontal and the camera.
   const units::radian_t CAMERA_PITCH = 15_deg;
 
-  // How far from the target we want to be
-  const units::meter_t GOAL_RANGE_METERS = 0.2_m;
+  // Target data
+  const units::meter_t TARGET_HEIGHT = 1_m;
 
-  photonlib::PhotonCamera camera{"limelight"};
-
-  // Components (e.g. motor controllers and sensors) should generally be
-  // declared private and exposed only through public methods.
+  //simulate vision target
+  frc::Transform2d _camtoRobot{{0_m,-0.2_m}, frc::Rotation2d {0_deg}};
+  photonlib::SimVisionSystem _simVision{"limelight", 70_deg, _camtoRobot, 0.5_m, 5_m, 640, 480, 10};
+  frc::Pose2d _target1Pose{54_ft, (27.0_ft/2) - 43.75_in - (48_in/2), 0_deg};
+  photonlib::SimVisionTarget _visionTarget1{_target1Pose, 0.5_m, 34.6_in, 17_in};
 };

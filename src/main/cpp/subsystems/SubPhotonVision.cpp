@@ -1,41 +1,29 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #include "subsystems/SubPhotonVision.h"
 #include <photonlib/PhotonUtils.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include "subsystems/SubDriveBase.h"
+#include "units/angle.h"
 
-SubPhotonVision::SubPhotonVision() = default;
+SubPhotonVision::SubPhotonVision(){
+  _simVision.AddSimVisionTarget(_visionTarget1);
+
+  SubDriveBase::GetInstance().DisplayPose("visionTarget", _target1Pose);
+}
 
 // This method will be called once per scheduler run
 void SubPhotonVision::Periodic() {
-
     photonlib::PhotonPipelineResult result = camera.GetLatestResult();
     
-
     if (result.HasTargets()) {
-      //First calculate range
       auto bestTarget = result.GetBestTarget();
-      HasTarget = true;
-      frc::SmartDashboard::PutBoolean("PhotonVisionTargetFound", HasTarget);
-     /* units::meter_t range = photonlib::PhotonUtils::CalculateDistanceToTarget(CAMERA_HEIGHT, TARGET_HEIGHT, CAMERA_PITCH,units::degree_t{result.GetBestTarget().GetPitch()});
-      frc::SmartDashboard::PutNumber("PhotonVisionRangeToTarget", double(range));
-      frc::SmartDashboard::PutNumber("LimeLightYaw", result.GetBestTarget().GetYaw()); */
-      frc::SmartDashboard::PutNumber("target Distance", bestTarget.GetCameraRelativePose().X().value()); 
-      frc::SmartDashboard::PutNumber("target Rotation", bestTarget.GetCameraRelativePose().Rotation().Degrees().value()); 
-      frc::SmartDashboard::PutNumber("target Y", bestTarget.GetCameraRelativePose().Y().value()); 
+      auto botToTarg = bestTarget.GetCameraToTarget();
 
-      // Use this range as the measurement we give to the PID controller.
-      //forwardSpeed =-controller.Calculate(range.value(), GOAL_RANGE_METERS.value());
-          
-    } else {
-      // If we have no targets, stay still.
-      //forwardSpeed = 0;
-      HasTarget = false;
-       frc::SmartDashboard::PutBoolean("PhotonVisionTargetFound", HasTarget);
+      frc::SmartDashboard::PutNumber("target X", botToTarg.X().value());
+      frc::SmartDashboard::PutNumber("target Rot",
+                                     botToTarg.Rotation().Z().value());
+      frc::SmartDashboard::PutNumber("target Y", botToTarg.Y().value());
+      frc::SmartDashboard::PutNumber("Rotation", GetRot().value());
     }
-
 }
 
 units::meter_t SubPhotonVision::GetX() {
@@ -43,8 +31,46 @@ units::meter_t SubPhotonVision::GetX() {
   
     if (result.HasTargets()) {
       auto bestTarget = result.GetBestTarget();
-      return bestTarget.GetCameraRelativePose().X();
+      return bestTarget.GetCameraToTarget().X();
     } else {
       return 0_m;
     }
+}
+units::meter_t SubPhotonVision::GetY() {
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+  
+    if (result.HasTargets()) {
+      auto bestTarget = result.GetBestTarget();
+      return bestTarget.GetCameraToTarget().Y();
+    } else {
+      return 0_m;
+    }
+}
+units::degree_t SubPhotonVision::GetRot() {
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+  
+    if (result.HasTargets()) {
+      auto bestTarget = result.GetBestTarget();
+      double yaw = bestTarget.GetYaw();
+      units::degree_t rotation {yaw};
+      return rotation;
+      
+    } else {
+      return 0_deg;
+    }
+}
+
+std::optional<frc::Transform3d> SubPhotonVision::GetBotToTarg() {
+  photonlib::PhotonPipelineResult result = camera.GetLatestResult();
+
+  if (result.HasTargets()) {
+    auto bestTarget = result.GetBestTarget();
+    return bestTarget.GetCameraToTarget();
+  } else {
+    return {};
+  }
+}
+
+void SubPhotonVision::SimulationPeriodic() {
+  _simVision.ProcessFrame(SubDriveBase::GetInstance().GetPose());
 }

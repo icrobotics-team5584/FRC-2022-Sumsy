@@ -7,16 +7,11 @@
 #include <cstdlib>
 #include <iostream>
 
-ICSparkMax::ICSparkMax(int deviceID, Type type)
+ICSparkMax::ICSparkMax(int deviceID, units::ampere_t currentLimit)
     : rev::CANSparkMax(deviceID,
                        rev::CANSparkMaxLowLevel::MotorType::kBrushless) {
-  _type = type;
   RestoreFactoryDefaults();
-  if (type == Type::NEO) {
-    SetSmartCurrentLimit(NEO_CURRENT_LIMIT);
-  } else {
-    SetSmartCurrentLimit(NEO_550_CURRENT_LIMIT);
-  }
+  SetSmartCurrentLimit(currentLimit.value());
 
   _pidController.SetSmartMotionMinOutputVelocity(0);
   SetClosedLoopOutputRange(-1, 1);

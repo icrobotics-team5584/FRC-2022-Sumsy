@@ -6,10 +6,17 @@
 #include "subsystems/SubDriveBase.h"
 #include <frc/MathUtil.h>
 #include <frc/RobotBase.h>
+#include <units/time.h>
 
 SubDriveBase::SubDriveBase(){
   m_gyro.Calibrate();
+  frc::SmartDashboard::PutData("Xcontroller", &Xcontroller);
   frc::SmartDashboard::PutData("field", &_fieldDisplay);
+  frc::SmartDashboard::PutData("x controller", &Xcontroller);
+  frc::SmartDashboard::PutData("y controller", &Ycontroller);
+  frc::SmartDashboard::PutData("rotation controller", &Rcontroller);
+  Rcontroller.EnableContinuousInput(-180_deg, 180_deg);
+
 }
 
 // This method will be called once per scheduler run
@@ -17,6 +24,7 @@ void SubDriveBase::Periodic() {
   frc::SmartDashboard::PutNumber("heading", GetHeading().Degrees().value());
   frc::SmartDashboard::PutNumber("gyro", m_gyro.GetAngle());
   frc::SmartDashboard::PutBoolean("gyro is callibrating", m_gyro.IsCalibrating());
+  frc::SmartDashboard::PutNumber("Drivebase speed", GetVelocity().value());
   UpdateOdometry();
 }
 
@@ -28,7 +36,7 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed, units::meters_per_se
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   // Set speed limit and apply speed limit to all modules
-  m_kinematics.DesaturateWheelSpeeds(&states, kMaxSpeed);
+  m_kinematics.DesaturateWheelSpeeds(&states, MAX_VELOCITY);
 
   // Setting modules from aquired states
   auto [fl, fr, bl, br] = states;
@@ -39,9 +47,10 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed, units::meters_per_se
 
   // Check if robot is in simulation. 
   // Manualy adjusting gyro by calculating rotation in simulator as gyro is not enabled in simulation
-  if (!frc::RobotBase::IsReal()) {
-    double degPer20MS = units::degrees_per_second_t(rot).value() / 20;
-    m_gyro.SetAngleAdjustment(GetHeading().Degrees().value() + degPer20MS);
+  if (frc::RobotBase::IsSimulation()) {
+    units::radian_t radPer20ms = rot * 20_ms;
+    units::degree_t newHeading = GetHeading().RotateBy(radPer20ms).Degrees();
+    m_gyro.SetAngleAdjustment(-newHeading.value()); // negative to switch to CW from CCW
   }
 }
 
@@ -54,39 +63,38 @@ void SubDriveBase::SyncSensors() {
   m_gyro.Calibrate();
 }
 
-// Convertion from 0-360 from gyro to -180 to 180
 frc::Rotation2d SubDriveBase::GetHeading() {
-  return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
+  return m_gyro.GetRotation2d();
 }
 
-void SubDriveBase::DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance) {
-   double speed = Xcontroller.Calculate(xDistance.value(), targetDistance.value());
-   Drive(speed*1_mps, 0_mps, 0_rad_per_s, false);
+void SubDriveBase::DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance, units::degree_t targetRotation) {
+   double speedX = -Xcontroller.Calculate(xDistance.value(), targetDistance.value());
+   double speedY = Ycontroller.Calculate(yDistance.value(), 0);
+   double speedRot = -Rcontroller.Calculate(targetRotation, 0_deg);
+   speedX = std::clamp(speedX, -0.5, 0.5);
+   speedY = std::clamp(speedY, -0.5, 0.5);
+   speedRot = std::clamp(speedRot, -2.0, 2.0);
+   Drive(speedX*1_mps, speedY*1_mps, speedRot*1_rad_per_s, false);
 }
 
-//void SubDriveBase::SetTargetRpm(double rpm){
-   // _controller.SetSetpoint(rpm);
-//}
-
-void SubDriveBase::UpdatePidControllerDrive() {
-    /*double feedForward = (1.0f/5300.0f)* _controller.GetSetpoint();
-    double _output = _controller.Calculate(_encShooter1.GetVelocity()) + feedForward;
-    if (_output >= 0) {
-        _spmShooter1.SetVoltage(units::volt_t(_output*12)); 
-    } else {
-       // _spmShooter1.Set(0);
-    } */
+// Calculate robot's velocity over past time step (20 ms)
+units::meters_per_second_t SubDriveBase::GetVelocity() {
+  auto robotDisplacement = _prevPose
+    .Translation()
+    .Distance(_poseEstimator
+      .GetEstimatedPosition()
+      .Translation()
+    );
+  return units::meters_per_second_t{robotDisplacement/20_ms};
 }
-//void SubShooter::Stop() {
-   // SetTargetRpm(0);
-   //_shouldTrackTarget = false;
-//}
+
 // calculates the relative field location
 void SubDriveBase::UpdateOdometry() {
   auto fl = m_frontLeft.GetState();
-  auto fr = m_frontLeft.GetState();
-  auto bl = m_frontLeft.GetState();
-  auto br = m_frontLeft.GetState();
+  auto fr = m_frontRight.GetState();
+  auto bl = m_backLeft.GetState();
+  auto br = m_backRight.GetState();
+  _prevPose = _poseEstimator.GetEstimatedPosition();
   _poseEstimator.Update(GetHeading(), fl, fr, bl, br);
   _fieldDisplay.SetRobotPose(_poseEstimator.GetEstimatedPosition());
 }
@@ -98,4 +106,14 @@ void SubDriveBase::DriveToPathPoint(frc::Pose2d& pos, units::meters_per_second_t
 
 void SubDriveBase::ResetGyroHeading() {
   m_gyro.Reset();
+}
+
+frc::Pose2d SubDriveBase::GetPose() {return _poseEstimator.GetEstimatedPosition();}
+
+void SubDriveBase::DisplayPose(std::string label, frc::Pose2d pose){
+  _fieldDisplay.GetObject(label)->SetPose(pose);
+}
+
+void SubDriveBase::UpdatePosition(frc::Pose2d robotPosition) {
+  _poseEstimator.AddVisionMeasurement(robotPosition, 2_ms);
 }

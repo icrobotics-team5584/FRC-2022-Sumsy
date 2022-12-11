@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #pragma once
 
 #include <frc2/command/Command.h>
@@ -17,19 +13,13 @@
  * scheduler calls).  Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
-class RobotContainer {
+class TankContainer {
  public:
-  RobotContainer();
+  TankContainer();
   frc2::Command* GetAutonomousCommand();
-  double ControllerGetLeftX();
-  double ControllerGetLeftY();
-  double ControllerGetRightX();
 
  private:
   // The robot's subsystems and commands are defined here...
   void ConfigureButtonBindings();
   JoystickScaler _controller {0, 2.5, 2.5};
-  frc2::JoystickButton _rightBumber {&_controller, frc::XboxController::Button::kRightBumper};
-  frc2::JoystickButton _leftBumber {&_controller, frc::XboxController::Button::kLeftBumper};
-  frc2::JoystickButton _start {&_controller, frc::XboxController::Button::kStart};
 };

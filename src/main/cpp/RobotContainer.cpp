@@ -12,13 +12,18 @@
 #include "subsystems/SubPhotonVision.h"
 #include "commands/CmdDriveToTarget.h"
 #include "commands/CmdAutoDrivePath.h"
+#include "units/angular_velocity.h"
+#include <frc/smartdashboard/SmartDashboard.h>
+#include "commands/CmdUpdatePosition.h"
 
 RobotContainer::RobotContainer(){
   // Initialize all of your commands and subsystems here
   SubDriveBase::GetInstance().SetDefaultCommand(CmdDriveRobot{&_controller});
-  SubPhotonVision::GetInstance();
+  SubPhotonVision::GetInstance().SetDefaultCommand(CmdUpdatePosition());
   // Configure the button bindings
   ConfigureButtonBindings();
+
+  frc::SmartDashboard::PutBoolean("SwerveDrive Enabled", true);
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -31,6 +36,9 @@ void RobotContainer::ConfigureButtonBindings() {
   Btn{&_controller, BtnId::kStart}.WhenPressed(CmdResetRotation{});
   Btn{&_controller, BtnId::kBack}.WhileHeld(CmdAutoDrivePath{});
   Btn{&_controller, BtnId::kA}.WhileHeld(CmdDriveToTarget{});
+  Btn{&_controller, BtnId::kB}.WhileHeld([&] {
+    SubDriveBase::GetInstance().Drive(0.5_mps, 0_mps, 0_deg_per_s, false);
+  }, {&SubDriveBase::GetInstance()});
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {\
