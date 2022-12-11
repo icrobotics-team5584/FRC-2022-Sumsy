@@ -56,7 +56,7 @@ class SwerveModule {
   const double DRIVE_F = 0;
   const int PID_SLOT_INDEX = 0;
   //tuned at 12.38V battery
-  frc::SimpleMotorFeedforward<units::meters> _feedFoward{0.62004_V, 1.2_V/1_mps, 0.23244_V/1_mps_sq};
+  frc::SimpleMotorFeedforward<units::meters> _feedFoward{0.62004_V, 2.2731_V/1_mps, 0.23244_V/1_mps_sq};
   TalonFX _canDriveMotor;
   TalonFX _canTurnMotor;
   CANCoder _canTurnEncoder;

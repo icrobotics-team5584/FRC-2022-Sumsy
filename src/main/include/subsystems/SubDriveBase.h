@@ -88,7 +88,7 @@ class SubDriveBase : public frc2::SubsystemBase {
 
   frc::SwerveDrivePoseEstimator<4> _poseEstimator{
       frc::Rotation2d(), frc::Pose2d(), m_kinematics, 
-      {0.0,0.0,0.0}, {0.00}, {0.0,0.0,0.0} 
+      {0.1,0.1,0.1}, {0.001}, {0.0,0.0,0.0} 
   };
   frc::Pose2d _prevPose; // Used for velocity calculations
 

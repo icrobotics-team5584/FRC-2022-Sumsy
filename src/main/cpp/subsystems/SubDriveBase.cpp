@@ -15,6 +15,8 @@ SubDriveBase::SubDriveBase(){
   frc::SmartDashboard::PutData("x controller", &Xcontroller);
   frc::SmartDashboard::PutData("y controller", &Ycontroller);
   frc::SmartDashboard::PutData("rotation controller", &Rcontroller);
+  Rcontroller.EnableContinuousInput(-180_deg, 180_deg);
+
 }
 
 // This method will be called once per scheduler run
@@ -46,8 +48,9 @@ void SubDriveBase::Drive(units::meters_per_second_t xSpeed, units::meters_per_se
   // Check if robot is in simulation. 
   // Manualy adjusting gyro by calculating rotation in simulator as gyro is not enabled in simulation
   if (frc::RobotBase::IsSimulation()) {
-    double degPer20MS = units::degrees_per_second_t(rot).value() / 20;
-    m_gyro.SetAngleAdjustment(GetHeading().Degrees().value() + degPer20MS);
+    units::radian_t radPer20ms = rot * 20_ms;
+    units::degree_t newHeading = GetHeading().RotateBy(radPer20ms).Degrees();
+    m_gyro.SetAngleAdjustment(-newHeading.value()); // negative to switch to CW from CCW
   }
 }
 
@@ -60,9 +63,8 @@ void SubDriveBase::SyncSensors() {
   m_gyro.Calibrate();
 }
 
-// Convertion from 0-360 from gyro to -180 to 180
 frc::Rotation2d SubDriveBase::GetHeading() {
-  return units::degree_t{frc::InputModulus(m_gyro.GetAngle(), -180.0, 180.0)};
+  return m_gyro.GetRotation2d();
 }
 
 void SubDriveBase::DriveToTarget(units::meter_t xDistance, units::meter_t yDistance, units::meter_t targetDistance, units::degree_t targetRotation) {
